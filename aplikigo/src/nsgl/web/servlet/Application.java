@@ -1,4 +1,4 @@
-package nsgl.web;
+package nsgl.web.servlet;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -9,20 +9,20 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import nsgl.app.Application;
 import nsgl.communication.Header;
 import nsgl.communication.Package;
 import nsgl.generic.list.Queue;
 import nsgl.io.file.FileLoaderFromServer;
 import nsgl.json.JSON;
+import nsgl.web.Session;
 
-public class Servlet extends HttpServlet{
+public class Application extends HttpServlet{
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 7070929784038920566L;
 	
-	protected Application server;
+	protected nsgl.app.Application server;
 	
 	public static final String app_queue = "app.queue";
 	

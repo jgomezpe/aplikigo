@@ -6,22 +6,22 @@ import nsgl.app.DefaultComponent;
 import nsgl.communication.Header;
 import nsgl.communication.Package;
 import nsgl.stringify.Stringifyable;
-import nsgl.web.Servlet;
+import nsgl.web.servlet.Application;
 
 public class JSView extends DefaultComponent{
-	protected Servlet servlet;
+	protected Application servlet;
 	
 	public JSView(String id) {
 		super(id);
 		servlet = null;
 	}
 	
-	public JSView(String id, Servlet servlet) {
+	public JSView(String id, Application servlet) {
 		super(id);
 		this.servlet = servlet;
 	}
 	
-	public void setServlet( Servlet servlet ) { this.servlet = servlet; }
+	public void setServlet( Application servlet ) { this.servlet = servlet; }
 	
 	protected Header header( String method ) {
 		Header h = new Header();

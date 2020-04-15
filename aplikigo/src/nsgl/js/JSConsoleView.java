@@ -1,7 +1,7 @@
 package nsgl.js;
 
 import nsgl.gui.ConsoleView;
-import nsgl.web.Servlet;
+import nsgl.web.servlet.Application;
 
 public class JSConsoleView extends JSView implements ConsoleView{
 	protected String out="";
@@ -9,7 +9,7 @@ public class JSConsoleView extends JSView implements ConsoleView{
 	
 	public JSConsoleView(String id){ super(id); }
 
-	public JSConsoleView(String id, Servlet servlet){ super(id, servlet); }
+	public JSConsoleView(String id, Application servlet){ super(id, servlet); }
 
 	@Override
 	public void display(boolean output){

@@ -5,7 +5,7 @@ import nsgl.generic.array.Vector;
 import nsgl.gui.Canvas;
 import nsgl.gui.paint.CanvasRender;
 import nsgl.gui.paint.Drawable;
-import nsgl.web.Servlet;
+import nsgl.web.servlet.Application;
 
 public class JSCanvasRender extends JSView implements CanvasRender{
 	protected Vector<Drawable> objects = new Vector<Drawable>();
@@ -16,7 +16,7 @@ public class JSCanvasRender extends JSView implements CanvasRender{
 		canvas = new JSCanvas(this); 
 	}
 	
-	public JSCanvasRender(String id, Servlet servlet){
+	public JSCanvasRender(String id, Application servlet){
 		super(id, servlet);
 		canvas = new JSCanvas(this); 
 	}

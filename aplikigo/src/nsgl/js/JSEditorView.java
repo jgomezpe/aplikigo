@@ -1,11 +1,11 @@
 package nsgl.js;
 
 import nsgl.gui.EditorView;
-import nsgl.web.Servlet;
+import nsgl.web.servlet.Application;
 
 public class JSEditorView extends JSView implements EditorView{
 	public JSEditorView(String id){ super(id); }
-	public JSEditorView(String id, Servlet servlet){ super(id, servlet); }
+	public JSEditorView(String id, Application servlet){ super(id, servlet); }
 
 
 	@Override
