@@ -1,20 +1,33 @@
 package nsgl.app;
 
 import nsgl.generic.Named;
-import nsgl.json.JSON;
 
-import java.lang.reflect.InvocationTargetException;
+public class Component implements Named{
+    protected String id;
 
-import nsgl.communication.Header;
-import nsgl.communication.Package;
+    public Component() {}
+    
+    public Component( String id ) { this.id = id; }
+    
+ 	@Override
+ 	public void setId(String id) { this.id = id; }
 
-public interface Component extends Named{
+ 	@Override
+ 	public String id() { return id; }
+  
+	public Object run( String method, Object... args ) throws Exception{
+		Class<?>[] types = new Class<?>[args.length];
+		for( int i=0; i<args.length; i++ ) types[i] = args[i].getClass();
+		return this.getClass().getMethod(method, types).invoke(this, args);
+	}
+    
+	/*
 	Component container();
 	void setContainer( Component container );
 
 	Application app();
 	void setApp( Application app );
-	
+
 	default Object addPackage( Package p ) {
 		Header h = p.header(); 
 		if( h.contentType()==Header.TXT ) {
@@ -26,10 +39,5 @@ public interface Component extends Named{
 		}else return run( h.method(), p.content() );
 	}
 	
-	default Object run( String method, Object... args ) {
-		Class<?>[] types = new Class<?>[args.length];
-		for( int i=0; i<args.length; i++ ) types[i] = args[i].getClass();
-		try{ return this.getClass().getMethod(method, types).invoke(this, args); }
-		catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) { return null; }
-	}
+	*/
 }

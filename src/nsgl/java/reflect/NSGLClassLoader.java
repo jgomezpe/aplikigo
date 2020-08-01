@@ -6,9 +6,7 @@ import java.net.URL;
 import java.util.Enumeration;
 
 import nsgl.generic.array.Vector;
-import nsgl.io.reader.ByteReader;
-import nsgl.iterator.Backable;
-import nsgl.io.Readable;
+import nsgl.io.Loadable;
 
 public class NSGLClassLoader extends ClassLoader{
 	protected Vector<ClassLoader> loader = new Vector<ClassLoader>();
@@ -35,10 +33,8 @@ public class NSGLClassLoader extends ClassLoader{
 		Class<?> cl = loadClass(className);
 		Object obj = cl.newInstance();
 		@SuppressWarnings("resource")
-		ByteReader reader = new ByteReader(is);
-		Readable r = Readable.cast(obj);
-		r.read((Backable<Integer>)reader.iterator());
-		return r;
+		Loadable r = Loadable.cast(obj);
+		return r.load(is);
 	}
 
 	@Override

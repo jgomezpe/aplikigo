@@ -1,8 +1,9 @@
 package nsgl.web.servlet;
 
 import nsgl.store.DataStore;
+import javax.servlet.http.HttpServlet;
 
-public abstract class DataStoreServlet /*extends Servlet*/{
+public class DataStoreServlet extends HttpServlet{
 	/**
 	 * 
 	 */

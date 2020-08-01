@@ -9,7 +9,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import nsgl.communication.Header;
+// import nsgl.communication.Header;
 import nsgl.communication.Package;
 import nsgl.generic.list.Queue;
 import nsgl.io.file.FileLoaderFromServer;
@@ -35,7 +35,7 @@ public class Application extends HttpServlet{
 
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		try{
+		/* try{
 			String url = request.getRequestURL().toString();
 			String servlet = request.getServletPath().substring(1);
 			url = url.substring(0,url.length()-servlet.length());
@@ -52,10 +52,10 @@ public class Application extends HttpServlet{
 			Package req = new Package(header, request.getInputStream());
 			System.out.println("[WebServlet]"+header);
 			Package resp;
-			if(req.header().target().equals(app_queue)) resp = queue.get();
+			if(req.headerbyte().target().equals(app_queue)) resp = queue.get();
 			else resp = (Package)server.addPackage( req );
 			
-			Header h = resp.header();
+			Header h = resp.headerbyte();
 			response.setContentType(h.contentType());
 			response.setHeader(Package.HEADER, h.toString());
 			InputStream in = resp.content();
@@ -69,6 +69,6 @@ public class Application extends HttpServlet{
 		}catch(Exception e){
 			e.printStackTrace();
 			response.getOutputStream().print(e.getMessage());
-		}
+		} */
 	}	
 }

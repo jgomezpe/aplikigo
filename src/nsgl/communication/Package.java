@@ -38,11 +38,13 @@
  */
 package nsgl.communication;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
 import nsgl.io.IOUtil;
 import nsgl.json.JSON;
+import nsgl.stringify.Stringifyable;
 
 /**
  * <p>Title: Package</p>
@@ -54,17 +56,108 @@ public class Package{
 	/**
 	 * Header label of a package
 	 */
-	public static final String HEADER = "header";
+	public static final String OBJECT = "object";
 
+	/**
+	 * Header label of a package
+	 */
+	public static final String METHOD = "method";
+
+	/**
+	 * Header label of a package
+	 */
+	public static final String ARGS = "args";
+
+	/**
+	 * Type of the content carried by the package
+	 */
+	public static final String CONTENT_TYPE = "ContentType";
+	
+	/**
+	 * The content of the package is a String
+	 */
+	public static final String TXT = "txt"; 
+	/**
+	 * Header label of a package
+	 */
+	public static final String BLOB = "blob";
+
+	
 	/**
 	 * Package information
 	 */
-	protected Header header;
+	protected JSON header;
 	
 	/**
 	 * Content of the package
 	 */
-	protected InputStream is=null;
+	protected InputStream is;
+	
+	public Package( int size, InputStream is ) throws IOException{
+	    byte[] buffer = new byte[size];
+	    is.read(buffer);
+	    header = new JSON( IOUtil.toString(IOUtil.toInputStream(buffer)) );
+	    Object[] a = header.getArray(ARGS);
+	    size = 0;
+	    byte[][] b = new byte[a.length][0];
+	    for( int i=0; i<a.length; i++) {
+		if(a[i] instanceof JSON && ((JSON)a[i]).get(BLOB)!=null) {
+		    int k = ((JSON)a[i]).getInt(BLOB);
+		    b[i] = new byte[k];
+		    is.read(b[i]);
+		    size += b[i].length;
+		}
+	    }
+	    if( size > 0 ) {
+		buffer = new byte[size];
+	    	size=0;
+	    	for( int i=0; i<b.length; i++ ) {
+	    	    System.arraycopy(b[i], 0, buffer, size, b[i].length);
+	    	    size += b[i].length;
+	    	}
+	    	is = new ByteArrayInputStream(buffer);
+	    	header.set(CONTENT_TYPE, BLOB);
+	    }else {
+	    	header.set(CONTENT_TYPE, TXT);
+	    }
+	}
+	
+	public Package( String object, String method, Object... args ){
+	    args = args.clone();
+	    header = new JSON();
+	    header.set(OBJECT, object);
+	    header.set(METHOD, method);
+	    int i=0;
+	    while(i<args.length && Stringifyable.cast(args[i])!=null) i++;
+	    if(i<args.length) {
+		int size = 0;
+		byte[][] b = new byte[args.length][0];
+		for(i=0; i<args.length; i++ ) {
+		    if( Stringifyable.cast(args[i])==null ) {
+			if( args[i] instanceof InputStream )
+			    try { b[i] = IOUtil.toByteArray((InputStream)args[i]); }
+			    catch (IOException e) { b[i] = new byte[0]; }
+			else if( args[i] instanceof byte[] ) b[i] = (byte[])args[i];
+			JSON j = new JSON();
+			j.set(BLOB, b[i].length);
+			args[i] = j;
+			size += b[i].length;
+		    }
+		}
+		byte[] buffer = new byte[size];
+		size=0;
+		for( i=0; i<b.length; i++ ) {
+		    System.arraycopy(b[i], 0, buffer, size, b[i].length);
+		    size += b[i].length;
+		}
+		is = new ByteArrayInputStream(buffer);
+		header.set(CONTENT_TYPE, BLOB);
+	    }else {
+		is = null;
+		header.set(CONTENT_TYPE, TXT);
+	    }
+	    header.set(ARGS, args);
+	}
 	
 	/**
 	 * Package constructor
@@ -72,43 +165,36 @@ public class Package{
 	 * @param is Content of the package
 	 */
 	public Package( JSON header, InputStream is ) {
-		this.header = new Header(header);
+		this.header = header;
 		this.is = is;
 	}
-	
-	/**
-	 * Package constructor when sending an String
-	 * @param header Package information
-	 * @param str Content of the package
-	 */
-	public Package( JSON header, String str ) {
-		this( header, IOUtil.toInputStream(str) );
-		this.header.set(Header.CONTENT_TYPE, Header.TXT);
-	}
-	
-	/**
-	 * Package constructor when sending a blob
-	 * @param header Package information
-	 * @param blob Content of the package
-	 */
-	public Package( JSON header, byte[] blob ) {
-		this( header, IOUtil.toInputStream(blob) );
-		this.header.set(Header.CONTENT_TYPE, Header.BLOB);
-	}
-	
+
 	/**
 	 * Gets the package information
 	 * @return Information of the package (JSON object)
 	 */
-	public Header header() { return header; }
+	public String object() { return header.getString(OBJECT); }
 
 	/**
-	 * Gets the package content
-	 * @return Package content
+	 * Gets the package information
+	 * @return Information of the package (JSON object)
 	 */
-	public InputStream content() { return is; }	
+	public String method() { return header.getString(METHOD); }
 	
-	public String contentAsString()  throws IOException { return IOUtil.toString(is); }
+	public Object[] args() throws IOException{
+	    Object[] a = header.getArray(ARGS).clone();
+	    for( int i=0; i<a.length; i++) {
+		if(a[i] instanceof JSON && ((JSON)a[i]).get(BLOB)!=null) {
+		    int k = ((JSON)a[i]).getInt(BLOB);
+		    byte[] b = new byte[k];
+		    is.read(b);
+		    a[i] = b;
+		}
+	    }
+	    return a;
+	}
 	
-	public byte[] contentAsByteArray()  throws IOException { return IOUtil.toByteArray(is); }	
+	public byte[] headerbyte() throws IOException { return IOUtil.toByteArray(IOUtil.toInputStream(header.stringify())); }
+	public InputStream is() { return is; }
+	
 }

@@ -1,8 +1,5 @@
 package nsgl.gui;
 
-import nsgl.gui.paint.Color;
-import nsgl.gui.paint.ColorInstance;
-import nsgl.gui.paint.PaintCommand;
 import nsgl.json.JSON;
 import nsgl.generic.hashmap.HashMap;
 
@@ -111,14 +108,12 @@ public abstract class Canvas{
 		}catch(Exception e){}	
 	}
 	
-	protected ColorInstance cinstance = new ColorInstance();
-	
-	public Color color( JSON json ){ return color(json, ColorInstance.COLOR); }
+	public Color color( JSON json ){ return color(json, Color.TAG); }
 	
 	public Color color( JSON json, String tag ){
 		try{
 			Object obj = json.get(tag);
-			return cinstance.load((JSON)obj);	
+			return new Color((JSON)obj);	
 		}catch( Exception e ){ return null; }
 	}
 		

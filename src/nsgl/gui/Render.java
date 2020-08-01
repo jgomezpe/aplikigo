@@ -1,8 +1,6 @@
 package nsgl.gui;
 
-import nsgl.app.Component;
-
-public interface Render extends Component{
+public interface Render{
 	void render();
 	default void render( Object obj ){
 		init();

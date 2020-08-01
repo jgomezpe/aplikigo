@@ -1,13 +1,12 @@
 package nsgl.app;
 
-import nsgl.communication.Header;
-import nsgl.communication.Package;
-import nsgl.generic.hashmap.HashMap;
-import nsgl.io.file.FileLoader;
-import nsgl.io.file.FileResource;
-
-public class Application extends HashMap<String,Component> {
-	protected FileResource files = new FileResource();
+public interface Application {
+    default Object run( String object, String method, Object... args ) throws Exception
+    { return get(object).run(method, args); }
+    
+    Component get( String id );
+/*
+    protected FileResource files = new FileResource();
 
 	public void addFileLoader( String id, FileLoader fl) { files.add(id,fl); }
 	
@@ -19,4 +18,5 @@ public class Application extends HashMap<String,Component> {
 		if( c!=null ){ return c.addPackage(p); }
 		return null;
 	} 
+*/	
 }
