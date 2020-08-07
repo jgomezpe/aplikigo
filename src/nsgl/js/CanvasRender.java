@@ -1,18 +1,14 @@
 package nsgl.js;
 
-import nsgl.communication.Channel;
+import nsgl.app.net.Channel;
 import nsgl.generic.Collection;
 import nsgl.generic.array.Vector;
-import nsgl.gui.Drawable;
+import nsgl.gui.paint.Drawable;
 
 public class CanvasRender extends Component implements nsgl.gui.CanvasRender{
 	protected Vector<Drawable> objects = new Vector<Drawable>();
 	protected Canvas canvas;
 
-	public CanvasRender(){
-		canvas = new Canvas(this); 
-	}
-	
 	public CanvasRender(String id, Channel client){
 		super(id, client);
 		canvas = new Canvas(this); 

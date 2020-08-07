@@ -1,10 +1,13 @@
 package nsgl.string.awt;
 
 import java.awt.BorderLayout;
+import java.awt.Font;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
+
+import nsgl.json.JXON;
 
 public class Render extends JPanel implements nsgl.string.Render{
 	protected String id;
@@ -32,11 +35,17 @@ public class Render extends JPanel implements nsgl.string.Render{
 	public void render(String str){ textArea.setText(str);	}
 	
 	@Override
-	public void add(String str){ textArea.setText(textArea.getText()+str); }
+	public void add(String str){ textArea.setText(textArea.getText()+"\n"+str); }
 	
 	@Override
 	public void init() { textArea.setText(""); }
 
 	@Override
 	public void render(){}
+	
+	@Override
+	public void setFont( Font font ) { if( textArea!=null) textArea.setFont(font); }
+
+	@Override
+	public void config(JXON json) {}
 }

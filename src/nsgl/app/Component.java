@@ -1,21 +1,7 @@
 package nsgl.app;
 
-import nsgl.generic.Named;
-
-public class Component implements Named{
-    protected String id;
-
-    public Component() {}
-    
-    public Component( String id ) { this.id = id; }
-    
- 	@Override
- 	public void setId(String id) { this.id = id; }
-
- 	@Override
- 	public String id() { return id; }
-  
-	public Object run( String method, Object... args ) throws Exception{
+public interface Component {
+	default Object run( String method, Object... args ) throws Exception{
 		Class<?>[] types = new Class<?>[args.length];
 		for( int i=0; i<args.length; i++ ) types[i] = args[i].getClass();
 		return this.getClass().getMethod(method, types).invoke(this, args);

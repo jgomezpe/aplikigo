@@ -9,7 +9,7 @@ import javax.swing.JPanel;
 import nsgl.generic.Collection;
 import nsgl.generic.array.Vector;
 import nsgl.generic.hashmap.HashMap;
-import nsgl.gui.Drawable;
+import nsgl.gui.paint.Drawable;
 
 public class CanvasRender extends JPanel implements nsgl.gui.CanvasRender{
 	protected Vector<Drawable> objects = new Vector<Drawable>();

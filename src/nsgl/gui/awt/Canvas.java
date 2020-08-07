@@ -12,20 +12,44 @@ import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 
 import nsgl.generic.hashmap.HashMap;
-import nsgl.gui.Color;
-import nsgl.gui.PaintCommand;
+import nsgl.gui.paint.Color;
+import nsgl.gui.paint.Command;
+import nsgl.json.JXON;
+import nsgl.stream.Resource;
+import nsgl.stream.loader.FromOS;
 
-public class Canvas extends nsgl.gui.Canvas{
+public class Canvas implements nsgl.gui.Canvas{
 	
 	protected Graphics2D g;
-	protected HashMap<String, Image> images = new HashMap<String,Image>();
 
+	protected double scale=1;
+
+	protected HashMap<String, Integer> primitives = new HashMap<String,Integer>();
+	protected HashMap<String, JXON> custom = new HashMap<String,JXON>();
+
+	public Canvas(){
+		primitives.set(Command.COMPOUND,0);
+		primitives.set(Command.MOVETO,1);
+		primitives.set(Command.LINETO,2);
+		primitives.set(Command.QUADTO,3);
+		primitives.set(Command.CURVETO,4);
+		primitives.set(Command.TEXT,5);
+		primitives.set(Command.IMAGE,6);
+		primitives.set(Command.BEGIN,7);
+		primitives.set(Command.CLOSE,8);
+		primitives.set(Command.STROKE,9);
+		primitives.set(Command.FILL,10);
+		primitives.set(Command.STROKESTYLE,11);
+		primitives.set(Command.FILLSTYLE,12);
+		primitives.set(Command.LINE,13);
+		primitives.set(Command.POLYLINE,14);
+		primitives.set(Command.POLYGON,15);
+		primitives.set(Command.TRANSLATE,16);
+		primitives.set(Command.ROTATE,17);
+		primitives.set(Command.SCALE,18);
+	}
 	
 	public void setGraphics( Graphics g ){ this.g = (Graphics2D)g; }
-	
-	public void addImage( String id, Image image ){ images.set(id, image); }
-	public void delImage( String id ){ images.remove(id); }
-	public void clearImages(){ images.clear(); }
 	
 	/**
 	 * Converts a given Image into a BufferedImage
@@ -54,106 +78,216 @@ public class Canvas extends nsgl.gui.Canvas{
 
 	GeneralPath path = new GeneralPath();
 	
-	@Override
-	public void moveTo(PaintCommand c) {
-		double x = scale(c.getReal(PaintCommand.X));
-		double y = scale(c.getReal(PaintCommand.Y));
+	protected double real( JXON c, String TAG ) { return c.getReal(TAG); }
+	protected double x( JXON c ) { return real(c, Command.X); }
+	protected double y( JXON c ) { return real(c, Command.Y); }
+	protected double[] array( JXON c, String TAG ) { return c.getRealArray(TAG); }
+	protected double[] X( JXON c ) { return array(c, Command.X); }
+	protected double[] Y( JXON c ) { return array(c, Command.Y); }
+	
+	public void moveTo(JXON c) {
+		double x = x(c);
+		double y = y(c);
 		path.moveTo(x, y);
 	}
 
-	@Override
-	public void lineTo(PaintCommand c) {
-		double x = scale(c.getReal(PaintCommand.X));
-		double y = scale(c.getReal(PaintCommand.Y));
+	public void lineTo(JXON c) {
+		double x = x(c);
+		double y = y(c);
 		path.lineTo(x, y);
 	}
 
-	@Override
-	public void quadTo(PaintCommand c) {
-		double[] x = scale(c.getRealArray(PaintCommand.X));
-		double[] y = scale(c.getRealArray(PaintCommand.Y));
+	public void line(JXON c){
+		beginPath();
+		double[] x = X(c);
+		double[] y = Y(c);
+		path.moveTo(x[0],y[0]);
+		path.lineTo(x[0],y[0]);
+		stroke();		
+	}
+	
+	protected void poly(double[] x, double[] y) {
+		beginPath();
+		path.moveTo(x[0],y[0]);
+		for( int i=1; i<x.length; i++) path.lineTo(x[i],y[i]);	    
+	}
+
+	protected void poly(JXON c){ poly(X(c),Y(c)); }
+	
+	public void polyline(JXON c){
+		poly(c);
+		stroke();
+	}
+
+	public void polygon(JXON c){
+		poly(c);
+		fill();
+	}
+
+	public void quadTo(JXON c) {
+		double[] x = X(c);
+		double[] y = Y(c);
 		path.quadTo(x[0], y[0], x[1], y[1]);
 	}
 
-	@Override
-	public void curveTo(PaintCommand c) {
-		double[] x = scale(c.getRealArray(PaintCommand.X));
-		double[] y = scale(c.getRealArray(PaintCommand.Y));
+	public void curveTo(JXON c) {
+		double[] x = X(c);
+		double[] y = Y(c);
 		path.curveTo(x[0], y[0], x[1], y[1], x[2], y[2]);
 	}
 
-	@Override
-	public void text(PaintCommand c) {
-		double x = scale(c.getReal(PaintCommand.X));
-		double y = scale(c.getReal(PaintCommand.Y));
-		String str = c.getString(PaintCommand.MESSAGE);
-		g.drawString(str, (int)scale(x), (int)scale(y)); 
+	public void text(JXON c) {
+		double x = x(c);
+		double y = y(c);
+		String str = c.getString(Command.MESSAGE);
+		g.drawString(str, (int)x, (int)y); 
 	}
 
-	@Override
-	public void image(PaintCommand c) {
-		double[] x = scale(c.getRealArray(PaintCommand.X));
-		double[] y = scale(c.getRealArray(PaintCommand.Y));
-		int rot = c.getInt(PaintCommand.IMAGE_ROT);
+	public void image(JXON c) {
+		double[] x = X(c);
+		double[] y = Y(c);
+		double rot = c.getReal(Command.R);
 		// boolean reflex = c.getBool(Command.IMAGE_REF);
-		String image_path = c.getString(PaintCommand.IMAGE_URL); 
-		Image obj = images.get(image_path);
-		/* @TODO if( obj==null ) {
-			try {
-				obj = null; FileResource.image(image_path);
-				images.set(image_path,obj);
-			}catch( IOException ex ){ return; }
-		} */
-		Image img = obj.getScaledInstance((int)scale(x[1]), (int)scale(y[1]), Image.SCALE_SMOOTH);
-		double rotationRequired = Math.toRadians(rot);
-		int cx = (img.getWidth(null) / 2);
-		int cy = (img.getHeight(null) / 2);
-		AffineTransform tx = AffineTransform.getRotateInstance(rotationRequired, cx, cy);
-		AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
+		String image_path = c.getString(Command.URL);
+		Resource resource = new Resource();
+		resource.add("local", new FromOS(""));
+		try{
+		    Image obj = resource.image(image_path);
+		    Image img = obj.getScaledInstance((int)(x[1]-x[0]), (int)(y[1]-y[0]), Image.SCALE_SMOOTH);
+		    int cx = (img.getWidth(null) / 2);
+		    int cy = (img.getHeight(null) / 2);
+		    AffineTransform tx = AffineTransform.getRotateInstance(rot, cx, cy);
+		    AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
 
-		// Drawing the rotated image at the required drawing locations
-		g.drawImage(op.filter(toBufferedImage(img), null),(int)scale(x[0]), (int)scale(y[0]), null);		
+		    // Drawing the rotated image at the required drawing locations
+		    g.drawImage(op.filter(toBufferedImage(img), null),(int)x[0], (int)y[0], null);		
+		}catch(Exception e) {}
 	}
 
-	@Override
 	public void beginPath(){ path = new GeneralPath(); }
 
-	@Override
 	public void closePath(){ path.closePath(); }
 
-	@Override
 	public void fill(){
 		path.closePath();
 		g.fill(path); 
 	}
 
-	@Override
 	public void stroke(){ g.draw(path); }
 
-	@Override
-	public void strokeStyle(PaintCommand c) {
+	public Color color(JXON c) { return color(c, Color.TAG); }
+	
+	public Color color(JXON c, String TAG) { 
+	    try{
+		return new Color(c.getJXON(TAG)); 
+	    }catch(Exception e) {
+		return new Color(255,255,255,255);
+	    }
+	}
+	
+	public void strokeStyle(JXON c) {
 		if( c.valid(Color.TAG) ) g.setColor(color2awt(color(c))); 
-		if( c.valid(PaintCommand.LINEWIDTH) ) g.setStroke(new BasicStroke(c.getInt(PaintCommand.LINEWIDTH)));
+		if( c.valid(Command.LINEWIDTH) ) g.setStroke(new BasicStroke(c.getInt(Command.LINEWIDTH)));
 		fillStyle(c);
 	}
 
-	@Override
-	public void fillStyle(PaintCommand c) {
+	public void fillStyle(JXON c) {
 		if( c.valid(Color.TAG) ){
 			g.setPaint(color2awt(color(c)));
 		}else{
-			java.awt.Color sc = color2awt(color(c, PaintCommand.STARTCOLOR));
-			java.awt.Color ec = color2awt(color(c, PaintCommand.ENDCOLOR));
-			if( c.valid(PaintCommand.R) ){
-				double x = (Double)c.x();
-				double y = (Double)c.y();
-				double r = c.getReal(PaintCommand.R);
+			java.awt.Color sc = color2awt(color(c, Command.STARTCOLOR));
+			java.awt.Color ec = color2awt(color(c, Command.ENDCOLOR));
+			if( c.valid(Command.R) ){
+				double x = x(c);
+				double y = y(c);
+				double r = real(c, Command.R);
 				g.setPaint(new RadialGradientPaint((float)x, (float)y, (float)r, new float[]{0.0f,1.0f}, new java.awt.Color[]{sc,ec}) );
 			}else{
-				double[] x = (double[])c.x();
-				double[] y = (double[])c.y();
+				double[] x = X(c);
+				double[] y = Y(c);
 				g.setPaint(new LinearGradientPaint((float)x[0], (float)y[0], (float)x[1], (float)y[1], new float[]{0.0f,1.0f}, new java.awt.Color[]{sc,ec}));
 			}
 		}
-	}	
+	}
+	
+	public void compound( JXON c ){
+		Object[] commands = c.getArray(Command.COMMANDS);
+		for( Object v : commands ){ command((JXON)v); }
+	}
+	
+	public void addCustomCommand(String id, JXON command) {
+	    custom.set(id, command);
+	}
+	
+	@Override
+	public void draw( JXON c ) { command(init(new JXON(c))); }
+	
+	protected JXON init( JXON c ) {
+	    JXON cc = custom.get(Command.type(c));  
+	    if( cc != null ) {
+		c = new JXON(cc);
+		c.set(Command.COMMAND, Command.COMPOUND);
+	    }
+	    
+	    if(c.get(Command.COMMANDS)!=null) {
+		Object[] obj = c.getArray(Command.COMMANDS);
+		for(int i=0; i<obj.length; i++)
+		    obj[i] = init((JXON)obj[i]);
+		c.set(Command.COMMANDS, obj);
+	    }
+	    return c;
+	}
+	
+	protected void command( JXON c ){
+		if( c==null ) return;
+		String type = c.getString(Command.COMMAND);
+		if( type == null ) return;
+		try{
+		    Integer cId = primitives.get(type);
+		    if( cId != null)
+			switch(cId){
+				case 0: compound(c); break; 
+				case 1: moveTo(c); break; 
+				case 2: lineTo(c); break; 
+				case 3: quadTo(c); break; 
+				case 4: curveTo(c); break; 
+				case 5: text(c); break; 
+				case 6: image(c); break; 
+				case 7: beginPath(); break; 
+				case 8: closePath(); break; 
+				case 9: stroke(); break; 
+				case 10: fill(); break; 
+				case 11: strokeStyle(c); break; 
+				case 12: fillStyle(c); break; 
+				case 13: line(c); break; 
+				case 14: polyline(c); break; 
+				case 15: polygon(c); break; 
+				case 16: 
+				    c = new JXON(c);
+				    c.set(Command.COMMAND, Command.COMPOUND);
+				    command(Command.translate(c, x(c), y(c))); 
+				break; 
+				case 17: 
+				    c = new JXON(c);
+				    c.set(Command.COMMAND, Command.COMPOUND);
+				    command(Command.rotate(c, x(c), y(c), real(c,Command.R))); 
+				break; 
+				case 18: 
+				    c = new JXON(c);
+				    c.set(Command.COMMAND, Command.COMPOUND);
+				    command(Command.scale(c, x(c))); 
+				break; 
+			}
+		}catch(Exception e){}	
+	}
+
+	@Override
+	public void config(JXON c) {
+	    custom.clear();
+	    Object[] commands = c.getArray(Command.COMMANDS);
+	    for( int i=0; i<commands.length; i++) {
+		JXON x = (JXON)commands[i];
+		custom.set(Command.type(x), x);
+	    }
+	}
 }

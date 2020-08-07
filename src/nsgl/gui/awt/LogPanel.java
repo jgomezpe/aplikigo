@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 
 import javax.swing.*;
 
+import nsgl.string.I18N;
+
 /**
  * <p>Title: LogPanel</p>
  *
@@ -42,8 +44,8 @@ public class LogPanel extends JPanel {
                       java.awt.BorderLayout.CENTER);
         jErrorPanel.setLayout(errorBorderLayout);
         this.add(jLogPaneTab, java.awt.BorderLayout.CENTER);
-        jLogPaneTab.add(jOutPanel, "out");
-        jLogPaneTab.add(jErrorPanel, "error");
+        jLogPaneTab.add(jOutPanel, I18N.process("·Out·"));
+        jLogPaneTab.add(jErrorPanel, I18N.process("·Error·"));
         jErrorPanel.add(new JScrollPane(jErrorTextArea),
                         java.awt.BorderLayout.CENTER);
     }

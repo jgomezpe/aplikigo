@@ -1,13 +1,11 @@
 package nsgl.js;
 
-import nsgl.communication.Channel;
+import nsgl.app.net.Channel;
 
 public class Console extends Component implements nsgl.gui.Console{
 	protected String out="";
 	protected String err="";
 	
-	public Console(){}
-
 	public Console(String id, Channel client){ super(id, client); }
 
 	@Override
