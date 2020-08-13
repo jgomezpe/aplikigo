@@ -1,7 +1,7 @@
 package nsgl.gui;
 
 import nsgl.app.Component;
-import nsgl.json.JXON;
+import nsgl.json.JSON;
 
 public interface Render extends Component{
 	static final String TAG = "render";
@@ -15,5 +15,5 @@ public interface Render extends Component{
 	void add( Object obj );
 	void init();
 	
-	void config( JXON json );
+	void config( JSON json );
 }

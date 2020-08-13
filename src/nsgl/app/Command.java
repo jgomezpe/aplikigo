@@ -2,10 +2,10 @@ package nsgl.app;
 
 import java.io.IOException;
 
-import nsgl.json.JXON;
+import nsgl.json.JSON;
 import nsgl.stringify.Stringifyable;
 
-public class Command extends JXON{
+public class Command extends JSON{
 	/**
 	 * Header label of a package
 	 */
@@ -20,9 +20,11 @@ public class Command extends JXON{
 	 * Header label of a package
 	 */
 	public static final String ARGS = "args";
+	
+	public Command( JSON jxon ) { super(jxon); }
 
 	public Command( String object, String method, Object... args ) throws IOException{
-	    args = args.clone();
+	    //args = args.clone();
 	    this.set(OBJECT, object);
 	    this.set(METHOD, method);
 	    int i=0;

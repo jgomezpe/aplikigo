@@ -3,7 +3,7 @@ package nsgl.gui.paint;
 import java.io.IOException;
 
 import nsgl.generic.Thing;
-import nsgl.json.JXON;
+import nsgl.json.JSON;
 
 public class Color implements Comparable<Object>, Thing{
 	public static final String TAG="color";
@@ -23,7 +23,7 @@ public class Color implements Comparable<Object>, Thing{
 		this.a = A;
 	}
 	
-	public Color(JXON json) throws IOException{ this.jxon(json); }
+	public Color(JSON json) throws IOException{ this.json(json); }
 
 	public int red(){ return r; }
 	public int green(){ return g; }
@@ -47,8 +47,8 @@ public class Color implements Comparable<Object>, Thing{
 	}
 	
 	    @Override
-	    public JXON jxon() {
-		JXON json = new JXON();
+	    public JSON json() {
+		JSON json = new JSON();
 		json.set(Color.RED, red());
 		json.set(Color.GREEN, green());
 		json.set(Color.BLUE, blue());
@@ -57,7 +57,7 @@ public class Color implements Comparable<Object>, Thing{
 	    }
 	    
 	@Override
-	public void jxon(JXON json) throws IOException{ 
+	public void json(JSON json) throws IOException{ 
 	    //@TODO check type of values, must be integers..
 	    r = json.getInt(RED);
 	    g = json.getInt(GREEN);

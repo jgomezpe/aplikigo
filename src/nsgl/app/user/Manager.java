@@ -1,60 +1,66 @@
 package nsgl.app.user;
 
-public abstract class Manager {
-	public static final String LOGOUT = "logout";
-	public static final String LOGIN = "login";
-	public static final String REGISTER = "register";
-	public static final String RECOVER = "recover";
-	public static final String UPDATE = "update";
-	public static final String UNREGISTER = "unregister";
+import nsgl.app.Application;
+import nsgl.json.JSON;
 
+public abstract class Manager implements Application{
+	public static final String USER = "user";
+	public static final String PASSWORD = "password";
 	public static final String CREDENTIAL = "credential";
+	
+	protected String id;
+	
+	public Manager( String id ) { this.id = id; }
+	
+	@Override
+	public String id() { return id; }
+	
+	@Override
+	public void id(String id) { this.id = id; }
 	
 	/*
 	 * Users
 	 */
-	public abstract User get( String id, String password );
+	public abstract JSON get( String id, String password );
 	public abstract boolean remove( String id );
-	public abstract boolean add( User user );
-	public abstract boolean set( User user );
+	public abstract boolean add( JSON user );
+	public abstract boolean update( JSON user );
 	public abstract boolean recover( String id );
 
 	/*
 	 * Credentials
 	 */
 	public abstract String issue(String id, String password);
-	public abstract String id(String credential);
+	public abstract String user(String credential);
 	public abstract boolean revoke(String credential);
 	
-	public User anonimizeUser(User user) {
-		String credential = issue(user.id(),user.password());
-		user = new User(user);		
-		user.remove(User.ID);
-		user.remove(User.PASSWORD);
+	public JSON anonimizeUser(JSON user) {
+		String credential = issue(user.getString(USER),user.getString(PASSWORD));
+		user.remove(PASSWORD);
 		user.set(CREDENTIAL, credential);
 		return user;
 	}
 
-	public User login( String id, String password ) {
-		User user = get( id, password );
+	public JSON login( String id, String password ) {
+		JSON user = get( id, password );
 		if( user!=null ) user=anonimizeUser(user);
 		return user;
 	}
 	
-	public User register( User user ) {
+	public JSON register( JSON user ) {
 	    if( !add(user) ) return null;
 	    return anonimizeUser(user);
 	}
 	
 	public boolean logout( String credential ) { return revoke(credential); }
 	
-	public boolean update( String credential, User user ) {
-		String id = id(credential);
-		return id==user.id() && set(user); 
+	public boolean update( String credential, JSON user ) {
+		String id = user(credential);
+		return id==user.getString(ID) && update(user); 
 	}
 	
 	public boolean del( String credential ) {
-		String id = id(credential);
+		String id = user(credential);
 		return id!=null && remove(id) && revoke(credential);
 	}
 }

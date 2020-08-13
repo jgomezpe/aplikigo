@@ -40,7 +40,7 @@ package nsgl.app.net;
 
 import java.io.IOException;
 
-import nsgl.json.JXON;
+import nsgl.json.JSON;
 
 /**
  * <p>Title: Package</p>
@@ -48,12 +48,17 @@ import nsgl.json.JXON;
  * <p>Description: A package that can be sent through the WEB</p>
  *
  */
-public class Package extends JXON{
+public class Package extends JSON{
 	/**
-	 * Header label of a package
+	 * Set of commands in the package
 	 */
 	public static final String COMMAND = "command";
 
+	/**
+	 * Credential of the user sending the package of commands
+	 */
+	public static final String CREDENTIAL = "credential";
+	
 	/**
 	 * Type of the content carried by the package
 	 */
@@ -67,10 +72,12 @@ public class Package extends JXON{
 	 * Header label of a package
 	 */
 	public static final String BLOB = "blob";
-
-	
 	
 	public Package( byte[] buffer ) throws IOException{ super( new String(buffer) ); }
 	
-	public Package( Object[] commands ) throws IOException{ this.set( COMMAND, commands ); }	
+	public Package( Object[] commands ) throws IOException{ this.set( COMMAND, commands ); }
+
+	public Object[] commands() { return getArray(COMMAND); }
+	
+	public JSON credential() { return getJSON(CREDENTIAL); }
 }

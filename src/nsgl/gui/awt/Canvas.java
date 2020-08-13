@@ -14,7 +14,7 @@ import java.awt.image.BufferedImage;
 import nsgl.generic.hashmap.HashMap;
 import nsgl.gui.paint.Color;
 import nsgl.gui.paint.Command;
-import nsgl.json.JXON;
+import nsgl.json.JSON;
 import nsgl.stream.Resource;
 import nsgl.stream.loader.FromOS;
 
@@ -25,7 +25,7 @@ public class Canvas implements nsgl.gui.Canvas{
 	protected double scale=1;
 
 	protected HashMap<String, Integer> primitives = new HashMap<String,Integer>();
-	protected HashMap<String, JXON> custom = new HashMap<String,JXON>();
+	protected HashMap<String, JSON> custom = new HashMap<String,JSON>();
 
 	public Canvas(){
 		primitives.set(Command.COMPOUND,0);
@@ -78,26 +78,26 @@ public class Canvas implements nsgl.gui.Canvas{
 
 	GeneralPath path = new GeneralPath();
 	
-	protected double real( JXON c, String TAG ) { return c.getReal(TAG); }
-	protected double x( JXON c ) { return real(c, Command.X); }
-	protected double y( JXON c ) { return real(c, Command.Y); }
-	protected double[] array( JXON c, String TAG ) { return c.getRealArray(TAG); }
-	protected double[] X( JXON c ) { return array(c, Command.X); }
-	protected double[] Y( JXON c ) { return array(c, Command.Y); }
+	protected double real( JSON c, String TAG ) { return c.getReal(TAG); }
+	protected double x( JSON c ) { return real(c, Command.X); }
+	protected double y( JSON c ) { return real(c, Command.Y); }
+	protected double[] array( JSON c, String TAG ) { return c.getRealArray(TAG); }
+	protected double[] X( JSON c ) { return array(c, Command.X); }
+	protected double[] Y( JSON c ) { return array(c, Command.Y); }
 	
-	public void moveTo(JXON c) {
+	public void moveTo(JSON c) {
 		double x = x(c);
 		double y = y(c);
 		path.moveTo(x, y);
 	}
 
-	public void lineTo(JXON c) {
+	public void lineTo(JSON c) {
 		double x = x(c);
 		double y = y(c);
 		path.lineTo(x, y);
 	}
 
-	public void line(JXON c){
+	public void line(JSON c){
 		beginPath();
 		double[] x = X(c);
 		double[] y = Y(c);
@@ -112,38 +112,38 @@ public class Canvas implements nsgl.gui.Canvas{
 		for( int i=1; i<x.length; i++) path.lineTo(x[i],y[i]);	    
 	}
 
-	protected void poly(JXON c){ poly(X(c),Y(c)); }
+	protected void poly(JSON c){ poly(X(c),Y(c)); }
 	
-	public void polyline(JXON c){
+	public void polyline(JSON c){
 		poly(c);
 		stroke();
 	}
 
-	public void polygon(JXON c){
+	public void polygon(JSON c){
 		poly(c);
 		fill();
 	}
 
-	public void quadTo(JXON c) {
+	public void quadTo(JSON c) {
 		double[] x = X(c);
 		double[] y = Y(c);
 		path.quadTo(x[0], y[0], x[1], y[1]);
 	}
 
-	public void curveTo(JXON c) {
+	public void curveTo(JSON c) {
 		double[] x = X(c);
 		double[] y = Y(c);
 		path.curveTo(x[0], y[0], x[1], y[1], x[2], y[2]);
 	}
 
-	public void text(JXON c) {
+	public void text(JSON c) {
 		double x = x(c);
 		double y = y(c);
 		String str = c.getString(Command.MESSAGE);
 		g.drawString(str, (int)x, (int)y); 
 	}
 
-	public void image(JXON c) {
+	public void image(JSON c) {
 		double[] x = X(c);
 		double[] y = Y(c);
 		double rot = c.getReal(Command.R);
@@ -175,23 +175,23 @@ public class Canvas implements nsgl.gui.Canvas{
 
 	public void stroke(){ g.draw(path); }
 
-	public Color color(JXON c) { return color(c, Color.TAG); }
+	public Color color(JSON c) { return color(c, Color.TAG); }
 	
-	public Color color(JXON c, String TAG) { 
+	public Color color(JSON c, String TAG) { 
 	    try{
-		return new Color(c.getJXON(TAG)); 
+		return new Color(c.getJSON(TAG)); 
 	    }catch(Exception e) {
 		return new Color(255,255,255,255);
 	    }
 	}
 	
-	public void strokeStyle(JXON c) {
+	public void strokeStyle(JSON c) {
 		if( c.valid(Color.TAG) ) g.setColor(color2awt(color(c))); 
 		if( c.valid(Command.LINEWIDTH) ) g.setStroke(new BasicStroke(c.getInt(Command.LINEWIDTH)));
 		fillStyle(c);
 	}
 
-	public void fillStyle(JXON c) {
+	public void fillStyle(JSON c) {
 		if( c.valid(Color.TAG) ){
 			g.setPaint(color2awt(color(c)));
 		}else{
@@ -210,35 +210,35 @@ public class Canvas implements nsgl.gui.Canvas{
 		}
 	}
 	
-	public void compound( JXON c ){
+	public void compound( JSON c ){
 		Object[] commands = c.getArray(Command.COMMANDS);
-		for( Object v : commands ){ command((JXON)v); }
+		for( Object v : commands ){ command((JSON)v); }
 	}
 	
-	public void addCustomCommand(String id, JXON command) {
+	public void addCustomCommand(String id, JSON command) {
 	    custom.set(id, command);
 	}
 	
 	@Override
-	public void draw( JXON c ) { command(init(new JXON(c))); }
+	public void draw( JSON c ) { command(init(new JSON(c))); }
 	
-	protected JXON init( JXON c ) {
-	    JXON cc = custom.get(Command.type(c));  
+	protected JSON init( JSON c ) {
+	    JSON cc = custom.get(Command.type(c));  
 	    if( cc != null ) {
-		c = new JXON(cc);
+		c = new JSON(cc);
 		c.set(Command.COMMAND, Command.COMPOUND);
 	    }
 	    
 	    if(c.get(Command.COMMANDS)!=null) {
 		Object[] obj = c.getArray(Command.COMMANDS);
 		for(int i=0; i<obj.length; i++)
-		    obj[i] = init((JXON)obj[i]);
+		    obj[i] = init((JSON)obj[i]);
 		c.set(Command.COMMANDS, obj);
 	    }
 	    return c;
 	}
 	
-	protected void command( JXON c ){
+	protected void command( JSON c ){
 		if( c==null ) return;
 		String type = c.getString(Command.COMMAND);
 		if( type == null ) return;
@@ -263,17 +263,17 @@ public class Canvas implements nsgl.gui.Canvas{
 				case 14: polyline(c); break; 
 				case 15: polygon(c); break; 
 				case 16: 
-				    c = new JXON(c);
+				    c = new JSON(c);
 				    c.set(Command.COMMAND, Command.COMPOUND);
 				    command(Command.translate(c, x(c), y(c))); 
 				break; 
 				case 17: 
-				    c = new JXON(c);
+				    c = new JSON(c);
 				    c.set(Command.COMMAND, Command.COMPOUND);
 				    command(Command.rotate(c, x(c), y(c), real(c,Command.R))); 
 				break; 
 				case 18: 
-				    c = new JXON(c);
+				    c = new JSON(c);
 				    c.set(Command.COMMAND, Command.COMPOUND);
 				    command(Command.scale(c, x(c))); 
 				break; 
@@ -282,11 +282,11 @@ public class Canvas implements nsgl.gui.Canvas{
 	}
 
 	@Override
-	public void config(JXON c) {
+	public void config(JSON c) {
 	    custom.clear();
 	    Object[] commands = c.getArray(Command.COMMANDS);
 	    for( int i=0; i<commands.length; i++) {
-		JXON x = (JXON)commands[i];
+		JSON x = (JSON)commands[i];
 		custom.set(Command.type(x), x);
 	    }
 	}

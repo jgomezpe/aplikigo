@@ -11,8 +11,10 @@ import nsgl.stream.Util;
 public abstract class OSManager implements Manager{
 	protected String realPath;
 	protected String aliasPath;
+	protected String id;
 	
-	public OSManager(String realPath, String aliasPath) {
+	public OSManager(String id, String realPath, String aliasPath) {
+	    this.id = id;
 		this.realPath = realPath;
 		if( !this.realPath.endsWith("/") )  this.realPath += '/';
 		this.aliasPath = aliasPath;
@@ -28,6 +30,12 @@ public abstract class OSManager implements Manager{
 		if(fileName.indexOf("..")>=0 || !fileName.startsWith(realPath)) return null;
 		return aliasPath+fileName.substring(realPath.length());
 	}
+	
+	@Override
+	public String id() { return id; }
+
+	@Override
+	public void id(String id) { this.id = id; }
 	
 	@Override
 	public boolean exist(String fileName) { return new File(fileName).exists(); }
@@ -60,7 +68,7 @@ public abstract class OSManager implements Manager{
 	}
 
 	@Override
-	public InputStream read(String fileName){
+	public InputStream getIS(String fileName){
 		fileName = alias2real(fileName);
 		if( fileName==null || fileName.endsWith("/")) return null;
 		try{ return new FileInputStream(fileName); }catch(Exception e) { return null; }

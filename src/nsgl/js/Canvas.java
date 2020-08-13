@@ -1,7 +1,7 @@
 package nsgl.js;
 
 import nsgl.gui.paint.Color;
-import nsgl.json.JXON;
+import nsgl.json.JSON;
 
 public class Canvas implements nsgl.gui.Canvas{
 	protected Color color=null;
@@ -10,8 +10,8 @@ public class Canvas implements nsgl.gui.Canvas{
 	public Canvas( CanvasRender render ){ this.render = render; }
 	
 	@Override
-	public void draw( JXON json ){ try{ render.run("draw", json); }catch(Exception e) {} }
+	public void draw( JSON json ){ try{ render.run("draw", json); }catch(Exception e) {} }
 
 	@Override
-	public void config(JXON c) {try{ render.run("config", c); }catch(Exception e) {} }
+	public void config(JSON c) {try{ render.run("config", c); }catch(Exception e) {} }
 }

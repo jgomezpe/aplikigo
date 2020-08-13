@@ -7,7 +7,7 @@ import nsgl.generic.array.Vector;
 import nsgl.generic.hashmap.HashMap;
 import nsgl.generic.keymap.KeyMap;
 import nsgl.gui.paint.Color;
-import nsgl.json.JXON;
+import nsgl.json.JSON;
 
 public class SyntaxStyle implements Thing{
 	public static final String STYLES = "styles";
@@ -38,7 +38,7 @@ public class SyntaxStyle implements Thing{
 		this.color = color;
 	}
 	
-	public SyntaxStyle(JXON json) throws IOException{ this.jxon(json); }
+	public SyntaxStyle(JSON json) throws IOException{ this.json(json); }
 	
 	public boolean italic(){ return italic; }
 	public boolean bold(){ return bold; }
@@ -50,12 +50,12 @@ public class SyntaxStyle implements Thing{
 	
 	public static KeyMap<String, SyntaxStyle> get( String styles ){
 		try {
-			JXON json = new JXON(styles);
+			JSON json = new JSON(styles);
 			HashMap<String, SyntaxStyle> km = new HashMap<String,SyntaxStyle>();
 			@SuppressWarnings("unchecked")
 			Vector<Object> objs = (Vector<Object>)json.get(STYLES);
 			for( Object o:objs ){
-				SyntaxStyle style = new SyntaxStyle((JXON)o);
+				SyntaxStyle style = new SyntaxStyle((JSON)o);
 				km.set(style.tag,style);
 			}
 			return km;
@@ -66,27 +66,27 @@ public class SyntaxStyle implements Thing{
 	}
 
 	@Override
-	public JXON jxon() {
-		JXON json = new JXON();
+	public JSON json() {
+		JSON json = new JSON();
 		json.set(DEF, tag);
 		json.set(SIZE, font_size());
 		if(bold()) json.set(BOLD, "true");
 		if(italic()) json.set(ITALIC, "true");
 		if(under_line()) json.set(UNDER_LINE, "true");
 		if(font_family()!=null)json.set(FONT, font_family());
-		if(color()!=null) json.set(Color.TAG, color().jxon());
+		if(color()!=null) json.set(Color.TAG, color().json());
 		return json;
 	}
 
-	protected boolean value( JXON json, String tag ){ return json.getBool(tag);	}
+	protected boolean value( JSON json, String tag ){ return json.getBool(tag);	}
 
 	@Override
-	public void jxon(JXON json) throws IOException {
+	public void json(JSON json) throws IOException {
 		size = json.getInt(SIZE);
 		bold = value(json,BOLD);
 		italic = value(json,ITALIC);
 		under_line = value(json,UNDER_LINE);
-		color = new Color((JXON)json.get(Color.TAG));
+		color = new Color((JSON)json.get(Color.TAG));
 		font_family = (String)json.get(FONT); 
 		tag = (String)json.get(DEF); 
 	}

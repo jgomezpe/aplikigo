@@ -1,7 +1,7 @@
 package nsgl.gui.paint;
 
-import nsgl.json.JXON;
+import nsgl.json.JSON;
 
 public interface Drawable {
-    JXON draw();
+    JSON draw();
 }

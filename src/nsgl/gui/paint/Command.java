@@ -1,6 +1,6 @@
 package nsgl.gui.paint;
 
-import nsgl.json.JXON;
+import nsgl.json.JSON;
 
 public class Command{
 	public final static String COMMAND="command";
@@ -36,18 +36,18 @@ public class Command{
 	public final static String ENDCOLOR="endcolor";
 	public final static String R="r";
 
-	public static String type( JXON c ) { return c.getString(COMMAND); }
-	public static double real( JXON c, String TAG ) { return c.getReal(TAG); }
-	public static double x( JXON c ) { return real(c, X); }
-	public static double y( JXON c ) { return real(c, Y); }
-	public static double[] array( JXON c, String TAG ) { return c.getRealArray(TAG);  }
-	public static double[] X( JXON c ) { return array(c, X); }
-	public static double[] Y( JXON c ) { return array(c, Y); }
+	public static String type( JSON c ) { return c.getString(COMMAND); }
+	public static double real( JSON c, String TAG ) { return c.getReal(TAG); }
+	public static double x( JSON c ) { return real(c, X); }
+	public static double y( JSON c ) { return real(c, Y); }
+	public static double[] array( JSON c, String TAG ) { return c.getRealArray(TAG);  }
+	public static double[] X( JSON c ) { return array(c, X); }
+	public static double[] Y( JSON c ) { return array(c, Y); }
 	
-	public static JXON translate( JXON command, double dx, double dy ){
+	public static JSON translate( JSON command, double dx, double dy ){
 		if( command.getArray(COMMANDS) != null ){
 			Object[] commands = command.getArray(COMMANDS);
-			for(int i=0; i<commands.length; i++ ) commands[i] = translate((JXON)commands[i],dx, dy);
+			for(int i=0; i<commands.length; i++ ) commands[i] = translate((JSON)commands[i],dx, dy);
 		}
 		if( command.get(X)==null ) return command;
 		double[] x = X(command);
@@ -87,13 +87,13 @@ public class Command{
 		}else return new double[]{px,py};			
 	}
 	
-	public static JXON rotate( JXON command, double cx, double cy, double angle ){
+	public static JSON rotate( JSON command, double cx, double cy, double angle ){
 		if( command.getArray(COMMANDS) != null ){
 			Object[] commands = command.getArray(COMMANDS);
-			for(int i=0; i<commands.length; i++ ) commands[i] = rotate((JXON)commands[i],cx,cy,angle);
+			for(int i=0; i<commands.length; i++ ) commands[i] = rotate((JSON)commands[i],cx,cy,angle);
 		}
 		if( type(command).equals(IMAGE) ) {
-		    command = new JXON(command);
+		    command = new JSON(command);
 		    command.set(R, command.getReal(R) + angle);
 		    return command;
 		}
@@ -123,10 +123,10 @@ public class Command{
 		return svalue;
 	}	
 	
-	public static JXON scale( JXON command, double s ) {
+	public static JSON scale( JSON command, double s ) {
 		if( command.getArray(COMMANDS) != null ){
 			Object[] commands = command.getArray(COMMANDS);
-			for(int i=0; i<commands.length; i++ ) commands[i] = scale((JXON)commands[i],s);
+			for(int i=0; i<commands.length; i++ ) commands[i] = scale((JSON)commands[i],s);
 		}
 		if( command.get(X)==null ) return command;
 		if( X(command) != null ){
@@ -141,117 +141,117 @@ public class Command{
 		return command;
 	}
 	
-	public static JXON create(String type) {
-		JXON jxon = new JXON();
+	public static JSON create(String type) {
+		JSON jxon = new JSON();
 		jxon.set(COMMAND, type);
 		return jxon;
 	}
 	
-	protected static JXON point( String command, double x, double y ){
-		JXON json = create(command);
+	protected static JSON point( String command, double x, double y ){
+		JSON json = create(command);
 		json.set(X, (Double)x);
 		json.set(Y, (Double)y);
 		return json;		
 	}
 	
-	public static JXON moveTo( double x, double y ){ return point(MOVETO,x,y); }
+	public static JSON moveTo( double x, double y ){ return point(MOVETO,x,y); }
 	
-	public static JXON lineTo( double x, double y ){ return point(LINETO,x,y); }
+	public static JSON lineTo( double x, double y ){ return point(LINETO,x,y); }
 
-	public static JXON poly( String command, double[] x, double[] y ){
-		JXON json = create(command);
+	public static JSON poly( String command, double[] x, double[] y ){
+		JSON json = create(command);
 		json.set(X, x);
 		json.set(Y, y);
 		return json;
 	}
 	
-	public static JXON quadTo( double cp1x, double cp1y, double x, double y )
+	public static JSON quadTo( double cp1x, double cp1y, double x, double y )
 	{ return poly(QUADTO, new double[]{cp1x,x}, new double[]{cp1y,y});	}
 	
-	public static JXON curveTo( double cp1x, double cp1y, double cp2x, double cp2y, double x, double y )
+	public static JSON curveTo( double cp1x, double cp1y, double cp2x, double cp2y, double x, double y )
 	{ return poly(CURVETO, new double[]{cp1x,cp2x,x}, new double[]{cp1y,cp2y,y});	}
 	
-	public static JXON line( double start_x, double start_y, double end_x, double end_y )
+	public static JSON line( double start_x, double start_y, double end_x, double end_y )
 	{ return poly( LINE, new double[]{ start_x, end_x }, new double[]{ start_y, end_y }); }
 	
-	public static JXON polygon( double[] x, double[] y ){ return poly(POLYGON, x, y); }
+	public static JSON polygon( double[] x, double[] y ){ return poly(POLYGON, x, y); }
 
-	public static JXON polyline( double[] x, double[] y ){ return poly(POLYLINE, x, y); }
+	public static JSON polyline( double[] x, double[] y ){ return poly(POLYLINE, x, y); }
 
-	public static JXON rect( double x, double y, double width, double height )
+	public static JSON rect( double x, double y, double width, double height )
 	{ return polyline( new double[]{x, x+width, x+width, x, x}, new double[]{y,y,y+height,y+height, y} ); }
 
-	public static JXON image( double x, double y, double width, double height, int rot, boolean reflex, String url ){
-		JXON img = poly(IMAGE, new double[] {x, width}, new double[] {y,height} );
+	public static JSON image( double x, double y, double width, double height, int rot, boolean reflex, String url ){
+		JSON img = poly(IMAGE, new double[] {x, width}, new double[] {y,height} );
 		img.set(R, rot);
 		img.set(URL, url);
 		return img;
 	}
 
-	public static JXON text( double x, double y, String str ){
-		JXON json = point(TEXT, x, y);
+	public static JSON text( double x, double y, String str ){
+		JSON json = point(TEXT, x, y);
 		json.set(MESSAGE, str);
 		return json;
 	} 	
 	
-	public static JXON beginPath(){ return create(BEGIN); }
-	public static JXON closePath(){ return create(CLOSE); }
-	public static JXON stroke(){ return create(STROKE); }
-	public static JXON fill(){ return create(FILL); }
+	public static JSON beginPath(){ return create(BEGIN); }
+	public static JSON closePath(){ return create(CLOSE); }
+	public static JSON stroke(){ return create(STROKE); }
+	public static JSON fill(){ return create(FILL); }
 	
-	protected static JXON colorStyle( String STYLE, Color color ){
-		JXON json = create(STYLE);
-		json.set(Color.TAG, color.jxon());
+	protected static JSON colorStyle( String STYLE, Color color ){
+		JSON json = create(STYLE);
+		json.set(Color.TAG, color.json());
 		return json;
 	} 
 	
-	protected static JXON linearGradientStyle( String STYLE, double x1, double y1, double x2, double y2, Color startcolor, Color endcolor ){
-		JXON c = poly(STYLE, new double[]{x1,x2}, new double[]{y1,y2});
-		c.set(STARTCOLOR, startcolor.jxon());
-		c.set(ENDCOLOR, endcolor.jxon());
+	protected static JSON linearGradientStyle( String STYLE, double x1, double y1, double x2, double y2, Color startcolor, Color endcolor ){
+		JSON c = poly(STYLE, new double[]{x1,x2}, new double[]{y1,y2});
+		c.set(STARTCOLOR, startcolor.json());
+		c.set(ENDCOLOR, endcolor.json());
 		return c;
 	} 
 
-	protected static JXON radialGradientStyle( String STYLE, double x, double y, double r, Color startcolor, Color endcolor ){ 
-		JXON c = linearGradientStyle(STYLE, x, y, x, y, startcolor, endcolor);
+	protected static JSON radialGradientStyle( String STYLE, double x, double y, double r, Color startcolor, Color endcolor ){ 
+		JSON c = linearGradientStyle(STYLE, x, y, x, y, startcolor, endcolor);
 		c.set(X, (Double)x);
 		c.set(Y, (Double)y);
 		c.set(R, (Double)r);
 		return c;
 	} 
 	
-	public static JXON strokeStyle( Color color ){ return colorStyle(STROKESTYLE, color); }
+	public static JSON strokeStyle( Color color ){ return colorStyle(STROKESTYLE, color); }
 	
-	public static JXON strokeStyle( Color color, int lineWidth ){
-		JXON c = strokeStyle(color); 
+	public static JSON strokeStyle( Color color, int lineWidth ){
+		JSON c = strokeStyle(color); 
 		c.set(LINEWIDTH, lineWidth);
 		return c;
 	}
 	
-	public static JXON strokeStyle( double x1, double y1, double x2, double y2, Color startcolor, Color endcolor )
+	public static JSON strokeStyle( double x1, double y1, double x2, double y2, Color startcolor, Color endcolor )
 	{ return linearGradientStyle(STROKESTYLE, x1, y1, x2, y2, startcolor, endcolor); } 
 
-	public static JXON strokeStyle( double x1, double y1, double x2, double y2, Color startcolor, Color endcolor, int lineWidth ){
-		JXON c = strokeStyle(x1, y1, x2, y2, startcolor, endcolor);
+	public static JSON strokeStyle( double x1, double y1, double x2, double y2, Color startcolor, Color endcolor, int lineWidth ){
+		JSON c = strokeStyle(x1, y1, x2, y2, startcolor, endcolor);
 		c.set(LINEWIDTH, lineWidth);
 		return c;
 	} 
 	
-	public static JXON strokeStyle( double x, double y, double r, Color startcolor, Color endcolor )
+	public static JSON strokeStyle( double x, double y, double r, Color startcolor, Color endcolor )
 	{ return radialGradientStyle(STROKESTYLE, x, y, r, startcolor, endcolor); } 
 
-	public static JXON strokeStyle( double x, double y, double r, Color startcolor, Color endcolor, int lineWidth ){
-		JXON c = strokeStyle(x, y, r, startcolor, endcolor);
+	public static JSON strokeStyle( double x, double y, double r, Color startcolor, Color endcolor, int lineWidth ){
+		JSON c = strokeStyle(x, y, r, startcolor, endcolor);
 		c.set(LINEWIDTH, lineWidth);
 		return c;
 	} 
 	
-	public static JXON fillStyle( Color color ){ return colorStyle(FILLSTYLE, color); }
+	public static JSON fillStyle( Color color ){ return colorStyle(FILLSTYLE, color); }
 	
-	public static JXON fillStyle( double x1, double y1, double x2, double y2, Color startcolor, Color endcolor )
+	public static JSON fillStyle( double x1, double y1, double x2, double y2, Color startcolor, Color endcolor )
 	{ return linearGradientStyle(FILLSTYLE, x1, y1, x2, y2, startcolor, endcolor); } 
 
-	public static JXON fillStyle( double x, double y, double r, Color startcolor, Color endcolor )
+	public static JSON fillStyle( double x, double y, double r, Color startcolor, Color endcolor )
 	{ return radialGradientStyle(FILLSTYLE, x, y, r, startcolor, endcolor); } 
 	
 /*	

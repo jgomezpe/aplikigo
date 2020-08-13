@@ -7,7 +7,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 
-import nsgl.json.JXON;
+import nsgl.json.JSON;
 
 public class Render extends JPanel implements nsgl.string.Render{
 	protected String id;
@@ -47,5 +47,5 @@ public class Render extends JPanel implements nsgl.string.Render{
 	public void setFont( Font font ) { if( textArea!=null) textArea.setFont(font); }
 
 	@Override
-	public void config(JXON json) {}
+	public void config(JSON json) {}
 }
