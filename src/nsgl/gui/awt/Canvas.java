@@ -1,6 +1,7 @@
 package nsgl.gui.awt;
 
 import java.awt.BasicStroke;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -12,8 +13,8 @@ import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 
 import nsgl.generic.hashmap.HashMap;
-import nsgl.gui.paint.Color;
-import nsgl.gui.paint.Command;
+import nsgl.gui.Color;
+import nsgl.gui.canvas.Util;
 import nsgl.json.JSON;
 import nsgl.stream.Resource;
 import nsgl.stream.loader.FromOS;
@@ -21,35 +22,153 @@ import nsgl.stream.loader.FromOS;
 public class Canvas implements nsgl.gui.Canvas{
 	
 	protected Graphics2D g;
+	protected CanvasRender render;
 
 	protected double scale=1;
 
 	protected HashMap<String, Integer> primitives = new HashMap<String,Integer>();
 	protected HashMap<String, JSON> custom = new HashMap<String,JSON>();
 
-	public Canvas(){
-		primitives.set(Command.COMPOUND,0);
-		primitives.set(Command.MOVETO,1);
-		primitives.set(Command.LINETO,2);
-		primitives.set(Command.QUADTO,3);
-		primitives.set(Command.CURVETO,4);
-		primitives.set(Command.TEXT,5);
-		primitives.set(Command.IMAGE,6);
-		primitives.set(Command.BEGIN,7);
-		primitives.set(Command.CLOSE,8);
-		primitives.set(Command.STROKE,9);
-		primitives.set(Command.FILL,10);
-		primitives.set(Command.STROKESTYLE,11);
-		primitives.set(Command.FILLSTYLE,12);
-		primitives.set(Command.LINE,13);
-		primitives.set(Command.POLYLINE,14);
-		primitives.set(Command.POLYGON,15);
-		primitives.set(Command.TRANSLATE,16);
-		primitives.set(Command.ROTATE,17);
-		primitives.set(Command.SCALE,18);
+	public Canvas( CanvasRender render ){
+		this.render = render;
+		primitives.set(Util.COMPOUND,0);
+		primitives.set(Util.MOVETO,1);
+		primitives.set(Util.LINETO,2);
+		primitives.set(Util.QUADTO,3);
+		primitives.set(Util.CURVETO,4);
+		primitives.set(Util.TEXT,5);
+		primitives.set(Util.IMAGE,6);
+		primitives.set(Util.BEGIN,7);
+		primitives.set(Util.CLOSE,8);
+		primitives.set(Util.STROKE,9);
+		primitives.set(Util.FILL,10);
+		primitives.set(Util.STROKESTYLE,11);
+		primitives.set(Util.FILLSTYLE,12);
+		primitives.set(Util.LINE,13);
+		primitives.set(Util.POLYLINE,14);
+		primitives.set(Util.POLYGON,15);
+		primitives.set(Util.TRANSLATE,16);
+		primitives.set(Util.ROTATE,17);
+		primitives.set(Util.SCALE,18);
+		primitives.set(Util.FIT,19);
 	}
 	
+	public void setRender( CanvasRender render ) { this.render = render; }
+	
 	public void setGraphics( Graphics g ){ this.g = (Graphics2D)g; }
+	
+	public String type( JSON c ) { return c.getString(Util.COMMAND); }
+	public double real( JSON c, String TAG ) { return c.getReal(TAG); }
+	public double[] array( JSON c, String TAG ) { return c.getRealArray(TAG);  }
+	public double x( JSON c ) { return real(c, Util.X); }
+	public double y( JSON c ) { return real(c, Util.Y); }
+	public double[] X( JSON c ) { return array(c, Util.X); }
+	public double[] Y( JSON c ) { return array(c, Util.Y); }
+	public Object[] commands(JSON c) { return c.getArray(Util.COMMANDS); }
+
+	public void x( JSON c, double x ) { c.set(Util.X, x); }
+	public void y( JSON c, double y ) { c.set(Util.Y, y);  }
+	public void X( JSON c, double[] x ) { c.set(Util.X, x); }
+	public void Y( JSON c, double[] y ) { c.set(Util.Y, y); }
+	public void commands(JSON c, Object[] obj) { c.set(Util.COMMANDS, obj); }
+	
+	public JSON translate( JSON command, double dx, double dy ){
+		Object[] commands = commands(command);
+		if( commands!= null ){
+			for(int i=0; i<commands.length; i++ ) commands[i] = translate((JSON)commands[i],dx, dy);
+		}
+		if( command.get(Util.X)==null ) return command;
+		double[] x = X(command);
+		if( x != null ){
+			double[] y = Y(command);
+			for( int i=0; i<x.length; i++ ){
+				x[i] += dx;
+				y[i] += dy;
+			}
+			X(command,x);
+			Y(command,y);
+		}else{
+			x(command,dx+x(command));
+			y(command,dy+y(command));
+		}	
+		return command;
+	}
+	
+	public double angle( double x1, double y1, double x2, double y2 ){
+		double a = (x2-x1); 
+		double b = (y2-y1);
+		double r = Math.sqrt(a*a+b*b);
+		if( r>1e-6 ){
+			double alpha = Math.acos(a/r);
+			if( b<0 ) alpha = 2.0*Math.PI - alpha;
+			return alpha;
+		}else return 0.0;
+	}
+	
+	public double[] rotate( double cx, double cy, double px, double py, double angle ){
+		double alpha = angle( cx, cy, px, py ) + angle;
+		if( alpha>1e-6 ){
+			double a = (px-cx); 
+			double b = (py-cy);
+			double r = Math.sqrt(a*a+b*b);
+			return new double[]{ cx + r*Math.cos(alpha), cy + r*Math.sin(alpha) };
+		}else return new double[]{px,py};			
+	}
+	
+	public JSON rotate( JSON command, double cx, double cy, double angle ){
+		Object[] commands = commands(command);
+		if( commands != null ){
+			for(int i=0; i<commands.length; i++ ) commands[i] = rotate((JSON)commands[i],cx,cy,angle);
+		}
+		if( type(command).equals(Util.IMAGE) ) {
+		    command = new JSON(command);
+		    command.set(Util.R, command.getReal(Util.R) + angle);
+		    return command;
+		}
+		if( command.get(Util.X)==null ) return command;
+		double[] x = X(command);
+		if( x != null ){
+			double[] y = Y(command);
+			for( int i=0; i<x.length; i++ ){
+				double[] p = rotate( cx, cy, x[i], y[i], angle );
+				x[i] = p[0];
+				y[i] = p[1];
+			}	
+			X(command,x);
+			Y(command,y);
+		}else{
+			double[] p = rotate( cx, cy, x(command), y(command), angle);
+			x(command,p[0]);
+			y(command,p[1]);
+		}
+		return command;
+	}
+	
+	public double[] scale( double[] value, double s ){
+		if( value == null ) return null;
+		double[] svalue = new double[value.length];
+		for( int i=0; i<svalue.length; i++ ) svalue[i] = value[i] * s;
+		return svalue;
+	}	
+	
+	public JSON scale( JSON command, double sx, double sy ) {
+		Object[] commands = commands(command);
+		if( commands != null ){
+			for(int i=0; i<commands.length; i++ ) commands[i] = scale((JSON)commands[i],sx,sy);
+		}
+		if( command.get(Util.X)==null ) return command;
+		double[] x = X(command);
+		if( x != null ){
+			x = scale(x, sx);
+			double[] y = scale(Y(command), sy);
+			X(command,x);
+			Y(command,y);
+		}else{
+			x(command,x(command)*sx);
+			y(command,y(command)*sy);
+		}
+		return command;
+	}
 	
 	/**
 	 * Converts a given Image into a BufferedImage
@@ -77,14 +196,7 @@ public class Canvas implements nsgl.gui.Canvas{
 	public static java.awt.Color color2awt( Color color ){ return new java.awt.Color(color.red(), color.green(), color.blue(), color.alpha()); }
 
 	GeneralPath path = new GeneralPath();
-	
-	protected double real( JSON c, String TAG ) { return c.getReal(TAG); }
-	protected double x( JSON c ) { return real(c, Command.X); }
-	protected double y( JSON c ) { return real(c, Command.Y); }
-	protected double[] array( JSON c, String TAG ) { return c.getRealArray(TAG); }
-	protected double[] X( JSON c ) { return array(c, Command.X); }
-	protected double[] Y( JSON c ) { return array(c, Command.Y); }
-	
+		
 	public void moveTo(JSON c) {
 		double x = x(c);
 		double y = y(c);
@@ -139,16 +251,16 @@ public class Canvas implements nsgl.gui.Canvas{
 	public void text(JSON c) {
 		double x = x(c);
 		double y = y(c);
-		String str = c.getString(Command.MESSAGE);
+		String str = c.getString(Util.MESSAGE);
 		g.drawString(str, (int)x, (int)y); 
 	}
 
 	public void image(JSON c) {
 		double[] x = X(c);
 		double[] y = Y(c);
-		double rot = c.getReal(Command.R);
+		double rot = c.getReal(Util.R);
 		// boolean reflex = c.getBool(Command.IMAGE_REF);
-		String image_path = c.getString(Command.URL);
+		String image_path = c.getString(Util.URL);
 		Resource resource = new Resource();
 		resource.add("local", new FromOS(""));
 		try{
@@ -187,7 +299,7 @@ public class Canvas implements nsgl.gui.Canvas{
 	
 	public void strokeStyle(JSON c) {
 		if( c.valid(Color.TAG) ) g.setColor(color2awt(color(c))); 
-		if( c.valid(Command.LINEWIDTH) ) g.setStroke(new BasicStroke(c.getInt(Command.LINEWIDTH)));
+		if( c.valid(Util.LINEWIDTH) ) g.setStroke(new BasicStroke(c.getInt(Util.LINEWIDTH)));
 		fillStyle(c);
 	}
 
@@ -195,12 +307,12 @@ public class Canvas implements nsgl.gui.Canvas{
 		if( c.valid(Color.TAG) ){
 			g.setPaint(color2awt(color(c)));
 		}else{
-			java.awt.Color sc = color2awt(color(c, Command.STARTCOLOR));
-			java.awt.Color ec = color2awt(color(c, Command.ENDCOLOR));
-			if( c.valid(Command.R) ){
+			java.awt.Color sc = color2awt(color(c, Util.STARTCOLOR));
+			java.awt.Color ec = color2awt(color(c, Util.ENDCOLOR));
+			if( c.valid(Util.R) ){
 				double x = x(c);
 				double y = y(c);
-				double r = real(c, Command.R);
+				double r = real(c, Util.R);
 				g.setPaint(new RadialGradientPaint((float)x, (float)y, (float)r, new float[]{0.0f,1.0f}, new java.awt.Color[]{sc,ec}) );
 			}else{
 				double[] x = X(c);
@@ -211,36 +323,90 @@ public class Canvas implements nsgl.gui.Canvas{
 	}
 	
 	public void compound( JSON c ){
-		Object[] commands = c.getArray(Command.COMMANDS);
+		Object[] commands = c.getArray(Util.COMMANDS);
 		for( Object v : commands ){ command((JSON)v); }
 	}
 	
+	public JSON translate( JSON c ) {
+	    c = new JSON(c);
+	    c.set(Util.COMMAND, Util.COMPOUND);
+	    return translate(c, x(c), y(c)); 	    
+	}
+	
+	public JSON rotate( JSON c ) {
+	    c = new JSON(c);
+	    c.set(Util.COMMAND, Util.COMPOUND);
+	    return rotate(c, x(c), y(c), real(c,Util.R)); 	    
+	}
+	
+	public JSON scale( JSON c ) {
+	    c = new JSON(c);
+	    c.set(Util.COMMAND, Util.COMPOUND);
+	    return scale(c, x(c), y(c)); 
+	}
+	
+	public JSON fit( JSON c ) {
+	    c = new JSON(c);
+	    c.set(Util.COMMAND, Util.SCALE);
+	    double x = x(c);
+	    double y = y(c);
+	    boolean keepAspectRatio = c.getBool(Util.R);
+	    Dimension d = render.getSize();
+	    double w = d.getWidth();
+	    double h = d.getHeight();
+	    if(keepAspectRatio) {
+		double scale;
+		if( w*x < h*y ) scale = w*x;
+		else scale = h*y;
+		x = scale;
+		y = scale;
+	    }else {
+		x *= w;
+		y *= h;
+	    }
+	    c.set(Util.X,x);
+	    c.set(Util.Y,y);
+	    return scale(c);
+	}
+	
+	
+
 	public void addCustomCommand(String id, JSON command) {
 	    custom.set(id, command);
 	}
 	
 	@Override
-	public void draw( JSON c ) { command(init(new JSON(c))); }
+	public void draw( JSON c ) { 
+	    command(init(new JSON(c))); 
+	}
 	
 	protected JSON init( JSON c ) {
-	    JSON cc = custom.get(Command.type(c));  
+	    JSON cc = custom.get(type(c));  
 	    if( cc != null ) {
 		c = new JSON(cc);
-		c.set(Command.COMMAND, Command.COMPOUND);
+		c.set(Util.COMMAND, Util.COMPOUND);
 	    }
-	    
-	    if(c.get(Command.COMMANDS)!=null) {
-		Object[] obj = c.getArray(Command.COMMANDS);
+
+	    if(c.get(Util.COMMANDS)!=null) {
+		c = new JSON(c);
+		Object[] obj = c.getArray(Util.COMMANDS);
 		for(int i=0; i<obj.length; i++)
 		    obj[i] = init((JSON)obj[i]);
-		c.set(Command.COMMANDS, obj);
+		c.set(Util.COMMANDS, obj);
+	    }
+	    int k = primitives.get(type(c));
+	    switch(k) {
+	    	case 16: return translate(c);
+	    	case 17: return rotate(c);
+	    	case 18: return scale(c);
+	    	case 19: return fit(c);
 	    }
 	    return c;
 	}
 	
 	protected void command( JSON c ){
 		if( c==null ) return;
-		String type = c.getString(Command.COMMAND);
+		String type = c.getString(Util.COMMAND);
 		if( type == null ) return;
 		try{
 		    Integer cId = primitives.get(type);
@@ -262,21 +428,6 @@ public class Canvas implements nsgl.gui.Canvas{
 				case 13: line(c); break; 
 				case 14: polyline(c); break; 
 				case 15: polygon(c); break; 
-				case 16: 
-				    c = new JSON(c);
-				    c.set(Command.COMMAND, Command.COMPOUND);
-				    command(Command.translate(c, x(c), y(c))); 
-				break; 
-				case 17: 
-				    c = new JSON(c);
-				    c.set(Command.COMMAND, Command.COMPOUND);
-				    command(Command.rotate(c, x(c), y(c), real(c,Command.R))); 
-				break; 
-				case 18: 
-				    c = new JSON(c);
-				    c.set(Command.COMMAND, Command.COMPOUND);
-				    command(Command.scale(c, x(c))); 
-				break; 
 			}
 		}catch(Exception e){}	
 	}
@@ -284,10 +435,10 @@ public class Canvas implements nsgl.gui.Canvas{
 	@Override
 	public void config(JSON c) {
 	    custom.clear();
-	    Object[] commands = c.getArray(Command.COMMANDS);
+	    Object[] commands = c.getArray(Util.COMMANDS);
 	    for( int i=0; i<commands.length; i++) {
 		JSON x = (JSON)commands[i];
-		custom.set(Command.type(x), x);
+		custom.set(type(x), x);
 	    }
 	}
 }

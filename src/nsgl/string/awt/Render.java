@@ -41,9 +41,6 @@ public class Render extends JPanel implements nsgl.string.Render{
 	public void init() { textArea.setText(""); }
 
 	@Override
-	public void render(){}
-	
-	@Override
 	public void setFont( Font font ) { if( textArea!=null) textArea.setFont(font); }
 
 	@Override

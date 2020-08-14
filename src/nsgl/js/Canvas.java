@@ -1,6 +1,6 @@
 package nsgl.js;
 
-import nsgl.gui.paint.Color;
+import nsgl.gui.Color;
 import nsgl.json.JSON;
 
 public class Canvas implements nsgl.gui.Canvas{

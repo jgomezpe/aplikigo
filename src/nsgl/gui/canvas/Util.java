@@ -1,8 +1,9 @@
-package nsgl.gui.paint;
+package nsgl.gui.canvas;
 
+import nsgl.gui.Color;
 import nsgl.json.JSON;
 
-public class Command{
+public class Util{
 	public final static String COMMAND="command";
 	public final static String SCALE="scale";
 	public final static String ROTATE="rotate";
@@ -23,6 +24,7 @@ public class Command{
 	public final static String LINE="line";
 	public final static String POLYLINE="polyline";
 	public final static String POLYGON="polygon";
+	public final static String FIT="fit";
 	// Arguments of the command
 	public final static String COMMANDS="commands";
 	public final static String X="x";
@@ -36,110 +38,6 @@ public class Command{
 	public final static String ENDCOLOR="endcolor";
 	public final static String R="r";
 
-	public static String type( JSON c ) { return c.getString(COMMAND); }
-	public static double real( JSON c, String TAG ) { return c.getReal(TAG); }
-	public static double x( JSON c ) { return real(c, X); }
-	public static double y( JSON c ) { return real(c, Y); }
-	public static double[] array( JSON c, String TAG ) { return c.getRealArray(TAG);  }
-	public static double[] X( JSON c ) { return array(c, X); }
-	public static double[] Y( JSON c ) { return array(c, Y); }
-	
-	public static JSON translate( JSON command, double dx, double dy ){
-		if( command.getArray(COMMANDS) != null ){
-			Object[] commands = command.getArray(COMMANDS);
-			for(int i=0; i<commands.length; i++ ) commands[i] = translate((JSON)commands[i],dx, dy);
-		}
-		if( command.get(X)==null ) return command;
-		double[] x = X(command);
-		if( x != null ){
-			double[] y = Y(command);
-			for( int i=0; i<x.length; i++ ){
-				x[i] += dx;
-				y[i] += dy;
-			}
-			command.set(X,x);
-			command.set(Y,y);
-		}else{
-			command.set(X,dx+x(command));
-			command.set(Y,dy+y(command));
-		}	
-		return command;
-	}
-	
-	public static double angle( double x1, double y1, double x2, double y2 ){
-		double a = (x2-x1); 
-		double b = (y2-y1);
-		double r = Math.sqrt(a*a+b*b);
-		if( r>1e-6 ){
-			double alpha = Math.acos(a/r);
-			if( b<0 ) alpha = 2.0*Math.PI - alpha;
-			return alpha;
-		}else return 0.0;
-	}
-	
-	public static double[] rotate( double cx, double cy, double px, double py, double angle ){
-		double alpha = angle( cx, cy, px, py ) + angle;
-		if( alpha>1e-6 ){
-			double a = (px-cx); 
-			double b = (py-cy);
-			double r = Math.sqrt(a*a+b*b);
-			return new double[]{ cx + r*Math.cos(alpha), cy + r*Math.sin(alpha) };
-		}else return new double[]{px,py};			
-	}
-	
-	public static JSON rotate( JSON command, double cx, double cy, double angle ){
-		if( command.getArray(COMMANDS) != null ){
-			Object[] commands = command.getArray(COMMANDS);
-			for(int i=0; i<commands.length; i++ ) commands[i] = rotate((JSON)commands[i],cx,cy,angle);
-		}
-		if( type(command).equals(IMAGE) ) {
-		    command = new JSON(command);
-		    command.set(R, command.getReal(R) + angle);
-		    return command;
-		}
-		if( command.get(X)==null ) return command;
-		if( X(command) != null ){
-			double[] x = X(command);
-			double[] y = Y(command);
-			for( int i=0; i<x.length; i++ ){
-				double[] p = rotate( cx, cy, x[i], y[i], angle );
-				x[i] = p[0];
-				y[i] = p[1];
-			}	
-			command.set(X,x);
-			command.set(Y,y);
-		}else{
-			double[] p = rotate( cx, cy, x(command), y(command), angle);
-			command.set(X,p[0]);
-			command.set(Y,p[1]);
-		}
-		return command;
-	}
-	
-	public static double[] scale( double[] value, double s ){
-		if( value == null ) return null;
-		double[] svalue = new double[value.length];
-		for( int i=0; i<svalue.length; i++ ) svalue[i] = value[i] * s;
-		return svalue;
-	}	
-	
-	public static JSON scale( JSON command, double s ) {
-		if( command.getArray(COMMANDS) != null ){
-			Object[] commands = command.getArray(COMMANDS);
-			for(int i=0; i<commands.length; i++ ) commands[i] = scale((JSON)commands[i],s);
-		}
-		if( command.get(X)==null ) return command;
-		if( X(command) != null ){
-			double[] x = scale(X(command), s);
-			double[] y = scale(Y(command), s);
-			command.set(X,x);
-			command.set(Y,y);
-		}else{
-			command.set(X,x(command)*s);
-			command.set(Y,y(command)*s);
-		}
-		return command;
-	}
 	
 	public static JSON create(String type) {
 		JSON jxon = new JSON();

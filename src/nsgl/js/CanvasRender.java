@@ -1,12 +1,10 @@
 package nsgl.js;
 
 import nsgl.app.net.Channel;
-import nsgl.generic.Collection;
-import nsgl.generic.array.Vector;
-import nsgl.gui.paint.Drawable;
+import nsgl.gui.Drawable;
 
-public class CanvasRender extends Component implements nsgl.gui.CanvasRender{
-	protected Vector<Drawable> objects = new Vector<Drawable>();
+public class CanvasRender extends Component implements nsgl.gui.canvas.Render{
+	protected Drawable object = null;
 	protected Canvas canvas;
 
 	public CanvasRender(String id, Channel client){
@@ -18,14 +16,8 @@ public class CanvasRender extends Component implements nsgl.gui.CanvasRender{
 	public nsgl.gui.Canvas getCanvas(){ return canvas; }
 
 	@Override
-	public Collection<Drawable> objects(){ return objects; }
+	public void init() { object = null; }
 
 	@Override
-	public void setCanvas(nsgl.gui.Canvas canvas){}
-	
-	@Override
-	public void render( Object obj ){
-		add(obj);
-		render();
-	}	
+	public void setCanvas(nsgl.gui.Canvas canvas){ this.canvas = (Canvas)canvas; }	
 }

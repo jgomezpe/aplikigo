@@ -6,7 +6,7 @@ import nsgl.generic.Thing;
 import nsgl.generic.array.Vector;
 import nsgl.generic.hashmap.HashMap;
 import nsgl.generic.keymap.KeyMap;
-import nsgl.gui.paint.Color;
+import nsgl.gui.Color;
 import nsgl.json.JSON;
 
 public class SyntaxStyle implements Thing{

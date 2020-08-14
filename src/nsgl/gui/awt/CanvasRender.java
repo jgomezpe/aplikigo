@@ -6,20 +6,18 @@ import java.awt.Image;
 
 import javax.swing.JPanel;
 
-import nsgl.generic.Collection;
-import nsgl.generic.array.Vector;
 import nsgl.generic.hashmap.HashMap;
-import nsgl.gui.paint.Drawable;
+import nsgl.gui.Drawable;
 
-public class CanvasRender extends JPanel implements nsgl.gui.CanvasRender{
-	protected Vector<Drawable> objects = new Vector<Drawable>();
+public class CanvasRender extends JPanel implements nsgl.gui.canvas.Render{
+	protected Drawable object = null;
 	
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -1691456845015325692L;
 
-	protected Canvas canvas = new Canvas();
+	protected Canvas canvas;
 	
 	protected HashMap<String, Image> images = new HashMap<String,Image>();
 	
@@ -27,11 +25,15 @@ public class CanvasRender extends JPanel implements nsgl.gui.CanvasRender{
 	
 	public CanvasRender( Color background_color ){
 		setBackground(background_color);
+		canvas = new Canvas(this);
 	}
+	
+	@Override
+	public void init() { object = null; }
 
 	@Override
-	public void render( Object obj ){
-		add(obj);
+	public void render( Drawable obj ){
+		object = (Drawable)obj;
 		updateUI();
 	}
 	
@@ -42,16 +44,15 @@ public class CanvasRender extends JPanel implements nsgl.gui.CanvasRender{
 	protected void paintComponent(Graphics g){
 		super.paintComponent(g);
 		canvas.setGraphics( g );
-		render();
+		if( object!= null ) canvas.draw(object.draw());
 	}		
 
 	@Override
 	public nsgl.gui.Canvas getCanvas(){ return canvas; }
 
 	@Override
-	public Collection<Drawable> objects(){ return objects; }
-
-	@Override
-	public void setCanvas(nsgl.gui.Canvas canvas){}
-
+	public void setCanvas(nsgl.gui.Canvas canvas){
+	    this.canvas = ((Canvas)canvas);
+	    this.canvas.setRender(this);
+	}
 }

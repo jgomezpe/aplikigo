@@ -1,4 +1,4 @@
-package nsgl.gui.paint;
+package nsgl.gui;
 
 import java.io.IOException;
 
