@@ -11,5 +11,9 @@ public class FromClassLoader implements Loader{
 	public FromClassLoader( ClassLoader loader ) { this.loader = loader; }
 	
 	@Override
-	public InputStream get(String name) throws IOException { return loader.getResourceAsStream(name); }
+	public InputStream get(String name) throws IOException { 
+	    InputStream is = loader.getResourceAsStream(name); 
+	    if( is==null ) throw new IOException("·No such resource·");
+	    return is;
+	}
 }

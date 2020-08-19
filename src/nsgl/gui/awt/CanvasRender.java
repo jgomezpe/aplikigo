@@ -7,10 +7,10 @@ import java.awt.Image;
 import javax.swing.JPanel;
 
 import nsgl.generic.hashmap.HashMap;
-import nsgl.gui.Drawable;
+import nsgl.json.JSON;
 
 public class CanvasRender extends JPanel implements nsgl.gui.canvas.Render{
-	protected Drawable object = null;
+	protected JSON object = null;
 	
 	/**
 	 * 
@@ -32,8 +32,8 @@ public class CanvasRender extends JPanel implements nsgl.gui.canvas.Render{
 	public void init() { object = null; }
 
 	@Override
-	public void render( Drawable obj ){
-		object = (Drawable)obj;
+	public void render( JSON obj ){
+		object = obj;
 		updateUI();
 	}
 	
@@ -44,7 +44,7 @@ public class CanvasRender extends JPanel implements nsgl.gui.canvas.Render{
 	protected void paintComponent(Graphics g){
 		super.paintComponent(g);
 		canvas.setGraphics( g );
-		if( object!= null ) canvas.draw(object.draw());
+		if( object!= null ) canvas.draw(object);
 	}		
 
 	@Override

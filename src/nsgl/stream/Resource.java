@@ -7,6 +7,8 @@ import java.net.URL;
 import javax.imageio.ImageIO;
 
 import nsgl.generic.hashmap.HashMap;
+import nsgl.json.JSON;
+import nsgl.stream.loader.FromOS;
 
 public class Resource {
 	// @TODO check Command, AWTCanvas, I18N, WebDictionaryController, DynWebServer
@@ -35,4 +37,16 @@ public class Resource {
 	
 	public String txt(String loader, String name ) throws IOException{ return txt( get(loader,name) );	}
 	public String txt( String name ) throws IOException{ return txt(get(name)); }	
+	
+	public static void main(String[] args) {
+	    try {
+		System.out.println(System.currentTimeMillis());
+		Resource resource = new Resource();
+		resource.add("local", new FromOS("/Users/jgomez/demo/clients/"));
+		JSON json = new JSON(resource.txt("admin.json"));
+		System.out.println(json.stringify());
+		System.out.println(System.currentTimeMillis());
+	    }catch(Exception e) {e.printStackTrace();}
+	}
+	
 }

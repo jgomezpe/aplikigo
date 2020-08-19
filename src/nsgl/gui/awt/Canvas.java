@@ -57,14 +57,14 @@ public class Canvas implements nsgl.gui.Canvas{
 	
 	public void setGraphics( Graphics g ){ this.g = (Graphics2D)g; }
 	
-	public String type( JSON c ) { return c.getString(Util.COMMAND); }
-	public double real( JSON c, String TAG ) { return c.getReal(TAG); }
-	public double[] array( JSON c, String TAG ) { return c.getRealArray(TAG);  }
+	public String type( JSON c ) { return c.string(Util.COMMAND); }
+	public double real( JSON c, String TAG ) { return c.real(TAG); }
+	public double[] array( JSON c, String TAG ) { return c.reals_array(TAG);  }
 	public double x( JSON c ) { return real(c, Util.X); }
 	public double y( JSON c ) { return real(c, Util.Y); }
 	public double[] X( JSON c ) { return array(c, Util.X); }
 	public double[] Y( JSON c ) { return array(c, Util.Y); }
-	public Object[] commands(JSON c) { return c.getArray(Util.COMMANDS); }
+	public Object[] commands(JSON c) { return c.array(Util.COMMANDS); }
 
 	public void x( JSON c, double x ) { c.set(Util.X, x); }
 	public void y( JSON c, double y ) { c.set(Util.Y, y);  }
@@ -122,7 +122,7 @@ public class Canvas implements nsgl.gui.Canvas{
 		}
 		if( type(command).equals(Util.IMAGE) ) {
 		    command = new JSON(command);
-		    command.set(Util.R, command.getReal(Util.R) + angle);
+		    command.set(Util.R, command.real(Util.R) + angle);
 		    return command;
 		}
 		if( command.get(Util.X)==null ) return command;
@@ -251,16 +251,16 @@ public class Canvas implements nsgl.gui.Canvas{
 	public void text(JSON c) {
 		double x = x(c);
 		double y = y(c);
-		String str = c.getString(Util.MESSAGE);
+		String str = c.string(Util.MESSAGE);
 		g.drawString(str, (int)x, (int)y); 
 	}
 
 	public void image(JSON c) {
 		double[] x = X(c);
 		double[] y = Y(c);
-		double rot = c.getReal(Util.R);
+		double rot = c.real(Util.R);
 		// boolean reflex = c.getBool(Command.IMAGE_REF);
-		String image_path = c.getString(Util.URL);
+		String image_path = c.string(Util.URL);
 		Resource resource = new Resource();
 		resource.add("local", new FromOS(""));
 		try{
@@ -291,7 +291,7 @@ public class Canvas implements nsgl.gui.Canvas{
 	
 	public Color color(JSON c, String TAG) { 
 	    try{
-		return new Color(c.getJSON(TAG)); 
+		return new Color(c.object(TAG)); 
 	    }catch(Exception e) {
 		return new Color(255,255,255,255);
 	    }
@@ -299,7 +299,7 @@ public class Canvas implements nsgl.gui.Canvas{
 	
 	public void strokeStyle(JSON c) {
 		if( c.valid(Color.TAG) ) g.setColor(color2awt(color(c))); 
-		if( c.valid(Util.LINEWIDTH) ) g.setStroke(new BasicStroke(c.getInt(Util.LINEWIDTH)));
+		if( c.valid(Util.LINEWIDTH) ) g.setStroke(new BasicStroke(c.integer(Util.LINEWIDTH)));
 		fillStyle(c);
 	}
 
@@ -323,7 +323,7 @@ public class Canvas implements nsgl.gui.Canvas{
 	}
 	
 	public void compound( JSON c ){
-		Object[] commands = c.getArray(Util.COMMANDS);
+		Object[] commands = c.array(Util.COMMANDS);
 		for( Object v : commands ){ command((JSON)v); }
 	}
 	
@@ -350,7 +350,7 @@ public class Canvas implements nsgl.gui.Canvas{
 	    c.set(Util.COMMAND, Util.SCALE);
 	    double x = x(c);
 	    double y = y(c);
-	    boolean keepAspectRatio = c.getBool(Util.R);
+	    boolean keepAspectRatio = c.bool(Util.R);
 	    Dimension d = render.getSize();
 	    double w = d.getWidth();
 	    double h = d.getHeight();
@@ -389,7 +389,7 @@ public class Canvas implements nsgl.gui.Canvas{
 
 	    if(c.get(Util.COMMANDS)!=null) {
 		c = new JSON(c);
-		Object[] obj = c.getArray(Util.COMMANDS);
+		Object[] obj = c.array(Util.COMMANDS);
 		for(int i=0; i<obj.length; i++)
 		    obj[i] = init((JSON)obj[i]);
 		c.set(Util.COMMANDS, obj);
@@ -406,7 +406,7 @@ public class Canvas implements nsgl.gui.Canvas{
 	
 	protected void command( JSON c ){
 		if( c==null ) return;
-		String type = c.getString(Util.COMMAND);
+		String type = c.string(Util.COMMAND);
 		if( type == null ) return;
 		try{
 		    Integer cId = primitives.get(type);
@@ -435,7 +435,7 @@ public class Canvas implements nsgl.gui.Canvas{
 	@Override
 	public void config(JSON c) {
 	    custom.clear();
-	    Object[] commands = c.getArray(Util.COMMANDS);
+	    Object[] commands = c.array(Util.COMMANDS);
 	    for( int i=0; i<commands.length; i++) {
 		JSON x = (JSON)commands[i];
 		custom.set(type(x), x);

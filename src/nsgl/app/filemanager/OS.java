@@ -1,4 +1,4 @@
-package nsgl.app.file;
+package nsgl.app.filemanager;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -6,36 +6,40 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import nsgl.app.user.Repository;
+import nsgl.json.JSON;
 import nsgl.stream.Util;
 
-public abstract class OSManager implements Manager{
+public class OS extends FileManager{
+	public static final String CAPTION = "caption";
+	public static final String CHILDREN = "children";
+	
 	protected String realPath;
 	protected String aliasPath;
-	protected String id;
 	
-	public OSManager(String id, String realPath, String aliasPath) {
-	    this.id = id;
-		this.realPath = realPath;
-		if( !this.realPath.endsWith("/") )  this.realPath += '/';
-		this.aliasPath = aliasPath;
-		if( !this.aliasPath.endsWith("/") )  this.aliasPath += '/';
+	public OS(String id, Repository clients, String realPath, String aliasPath) {
+		super(id, clients);
+		this.id = id;		
+		if(realPath.length()>0 && !realPath.endsWith("/") )  this.realPath = realPath + '/';
+		else this.realPath = realPath;
+		if( !aliasPath.endsWith("/") )  this.aliasPath = aliasPath + '/';
+		else this.aliasPath = aliasPath;
 	}
 	
+	protected String realPath() { return realPath; }
+	protected String aliasPath() { return aliasPath; }
+	
 	protected String alias2real(String fileName) {
-		if(fileName.indexOf("..")>=0 || !fileName.startsWith(aliasPath)) return null;
-		return realPath+fileName.substring(aliasPath.length());
+		String ap = aliasPath();
+		if(fileName.indexOf("..")>=0 || !fileName.startsWith(ap)) return null;
+		return realPath()+fileName.substring(ap.length());
 	}
 	
 	protected String real2alias(String fileName) {
-		if(fileName.indexOf("..")>=0 || !fileName.startsWith(realPath)) return null;
-		return aliasPath+fileName.substring(realPath.length());
+		String rp = realPath();
+		if(fileName.indexOf("..")>=0 || !fileName.startsWith(rp)) return null;
+		return aliasPath()+fileName.substring(rp.length());
 	}
-	
-	@Override
-	public String id() { return id; }
-
-	@Override
-	public void id(String id) { this.id = id; }
 	
 	@Override
 	public boolean exist(String fileName) { return new File(fileName).exists(); }
@@ -91,43 +95,43 @@ public abstract class OSManager implements Manager{
 		return deleteDir(new File(fileName));
 	}
 
-	public String folder(String realName, boolean isRoot) throws IOException {
-	    	StringBuilder sb = new StringBuilder();
+	public JSON folder(String realName) throws IOException {
 		File f = new File(realName);
+		JSON json = new JSON();
 		if(f.isDirectory()) {
 			if( !realName.endsWith("/") ) realName += '/';
-			sb.append("{");
-			if( isRoot ){
-				sb.append("\"plugin\":\"accordion\",");
-			}
 			String name = real2alias(realName);
 			name = name.substring(0,name.length()-1);
 			int idx = name.lastIndexOf('/');
 			String caption;
 			if( idx >=0 ) caption = name.substring(idx+1);
 			else caption = name;
-			sb.append("\"id\":\""+name+"\",");
-			sb.append("\"caption\":\""+caption+"\",");
-			sb.append("\"children\":[");
-			char comma=' ';
+			json.set(ID, name);
+			json.set(CAPTION, caption);
 			String[] list = f.list();
-			for(int i=0; list!=null && i<list.length; i++) {
-				sb.append(comma);
-				sb.append(folder(realName+list[i],false));
-				comma = ',';
+			Object[] children = new Object[list.length];
+			for(int i=0; i<list.length; i++) {
+				if( list[i] != null )  children[i] = folder(realName+list[i]);
+				else children[i] = null;
 			}
-			sb.append("]}");
+			json.set(CHILDREN, children);
 		}else{
 			String name = real2alias(realName);
 			int idx = name.lastIndexOf('/');
 			String caption;
 			if( idx >=0 ) caption = name.substring(idx+1);
 			else caption = name;
-			sb.append("{\"id\":\""+name+"\", \"caption\":\""+caption+"\"}");
+			json.set(ID, name);
+			json.set(CAPTION, caption);
 		}
-		return sb.toString();
+		return json;
 	}
 
 	@Override
-	public String folder() throws IOException { return folder(realPath, true); }
+	public JSON folder() throws IOException { return folder(realPath); }
+
+	@Override
+	public boolean store(String fileName, byte[] is) throws IOException {
+	    	return this.store(fileName, Util.toInputStream(is));
+	}
 }

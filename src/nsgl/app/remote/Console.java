@@ -1,4 +1,4 @@
-package nsgl.js;
+package nsgl.app.remote;
 
 import nsgl.app.net.Channel;
 

@@ -1,4 +1,4 @@
-package nsgl.web.cors;
+package nsgl.app.web.cors;
 
 import java.io.IOException;
 import javax.servlet.Filter;

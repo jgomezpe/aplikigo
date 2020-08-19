@@ -1,7 +1,5 @@
 package nsgl.gui;
 
-import java.io.IOException;
-
 import nsgl.generic.Thing;
 import nsgl.json.JSON;
 
@@ -23,7 +21,7 @@ public class Color implements Comparable<Object>, Thing{
 		this.a = A;
 	}
 	
-	public Color(JSON json) throws IOException{ this.json(json); }
+	public Color(JSON json) { this.config(json); }
 
 	public int red(){ return r; }
 	public int green(){ return g; }
@@ -57,11 +55,11 @@ public class Color implements Comparable<Object>, Thing{
 	    }
 	    
 	@Override
-	public void json(JSON json) throws IOException{ 
+	public void config(JSON json){ 
 	    //@TODO check type of values, must be integers..
-	    r = json.getInt(RED);
-	    g = json.getInt(GREEN);
-	    b = json.getInt(BLUE);
-	    a = json.getInt(ALPHA);
+	    r = json.integer(RED);
+	    g = json.integer(GREEN);
+	    b = json.integer(BLUE);
+	    a = json.integer(ALPHA);
 	}
 }

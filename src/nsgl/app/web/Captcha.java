@@ -1,4 +1,4 @@
-package nsgl.js;
+package nsgl.app.web;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -8,13 +8,13 @@ import java.nio.charset.Charset;
 
 import nsgl.json.JSON;
 
-public class JSCaptcha {
+public class Captcha {
 	protected boolean verified = false;
 	protected String key;
 
 	public static final String url = "https://www.google.com/recaptcha/api/siteverify";
 	
-	public JSCaptcha( String key ){ this.key = key; }
+	public Captcha( String key ){ this.key = key; }
 
 	public synchronized String verify(String response){
 		verified = false;
@@ -34,7 +34,7 @@ public class JSCaptcha {
 	        res.close();
 
 	        JSON json = new JSON(jsonText);
-	        verified = json.getBool("success");
+	        verified = json.bool("success");
 	        return jsonText;
 	    } catch (Exception e) {
 	        //e.printStackTrace();

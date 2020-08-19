@@ -1,4 +1,4 @@
-package nsgl.web.servlet;
+package nsgl.app.web.servlet;
 
 import nsgl.store.DataStore;
 import javax.servlet.http.HttpServlet;

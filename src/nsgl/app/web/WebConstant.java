@@ -1,4 +1,4 @@
-package nsgl.web;
+package nsgl.app.web;
 
 public class WebConstant {
 	public static final String NAVIGATOR = "navigator";

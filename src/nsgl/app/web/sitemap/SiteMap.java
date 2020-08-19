@@ -1,8 +1,10 @@
-package nsgl.web.sitemap;
+package nsgl.app.web.sitemap;
 
 import java.util.Iterator;
 
-public interface SiteMap {
+import nsgl.app.Application;
+
+public interface SiteMap extends Application{
 	default String urlmap(String u){
 		StringBuilder sb = new StringBuilder();
 		sb.append("\t<url>\n");

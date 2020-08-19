@@ -38,7 +38,7 @@ public class SyntaxStyle implements Thing{
 		this.color = color;
 	}
 	
-	public SyntaxStyle(JSON json) throws IOException{ this.json(json); }
+	public SyntaxStyle(JSON json) throws IOException{ this.config(json); }
 	
 	public boolean italic(){ return italic; }
 	public boolean bold(){ return bold; }
@@ -78,15 +78,15 @@ public class SyntaxStyle implements Thing{
 		return json;
 	}
 
-	protected boolean value( JSON json, String tag ){ return json.getBool(tag);	}
+	protected boolean value( JSON json, String tag ){ return json.bool(tag);	}
 
 	@Override
-	public void json(JSON json) throws IOException {
-		size = json.getInt(SIZE);
+	public void config(JSON json){
+		size = json.integer(SIZE);
 		bold = value(json,BOLD);
 		italic = value(json,ITALIC);
 		under_line = value(json,UNDER_LINE);
-		color = new Color((JSON)json.get(Color.TAG));
+		color = new Color(json.object(Color.TAG));
 		font_family = (String)json.get(FONT); 
 		tag = (String)json.get(DEF); 
 	}

@@ -1,12 +1,12 @@
 package nsgl.gui;
 
 import nsgl.app.Component;
+import nsgl.generic.Configurable;
 import nsgl.json.JSON;
 
-public interface Canvas extends Component{
+public interface Canvas extends Component, Configurable{
     	static final String TAG = "canvas";
 	void draw( JSON c );
-	void config( JSON c );
 	
 	/**
 	
