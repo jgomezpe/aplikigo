@@ -48,10 +48,10 @@ public class CanvasRender extends JPanel implements aplikigo.gui.canvas.Render{
 	}		
 
 	@Override
-	public aplikigo.gui.Canvas getCanvas(){ return canvas; }
+	public aplikigo.gui.Canvas canvas(){ return canvas; }
 
 	@Override
-	public void setCanvas(aplikigo.gui.Canvas canvas){
+	public void canvas(aplikigo.gui.Canvas canvas){
 	    this.canvas = ((Canvas)canvas);
 	    this.canvas.setRender(this);
 	}

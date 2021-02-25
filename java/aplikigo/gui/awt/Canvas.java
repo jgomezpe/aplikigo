@@ -434,7 +434,7 @@ public class Canvas implements aplikigo.gui.Canvas{
 	@Override
 	public void config(JXON c) {
 	    custom.clear();
-	    Object[] commands = c.array(Util.COMMANDS);
+	    Object[] commands = c.array(Util.CUSTOM);
 	    for( int i=0; i<commands.length; i++) {
 		JXON x = (JXON)commands[i];
 		custom.put(type(x), x);

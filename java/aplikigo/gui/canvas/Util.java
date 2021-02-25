@@ -26,6 +26,7 @@ public class Util{
 	public final static String POLYGON="polygon";
 	public final static String FIT="fit";
 	// Arguments of the command
+	public final static String CUSTOM="custom";
 	public final static String COMMANDS="commands";
 	public final static String X="x";
 	public final static String Y="y";

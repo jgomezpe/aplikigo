@@ -5,10 +5,10 @@ import jxon.Castable;
 import jxon.JXON;
 
 public interface Render extends aplikigo.gui.Render{
-	void setCanvas( Canvas canvas );	
-	Canvas getCanvas();
+	void canvas( Canvas canvas );	
+	Canvas canvas();
 	
-	default void render( JXON obj ){ if( obj!=null && getCanvas()!=null ) getCanvas().draw(obj); }
+	default void render( JXON obj ){ if( obj!=null && canvas()!=null ) canvas().draw(obj); }
 	
 	default void render( Object obj ){
 	    if( obj instanceof JXON ) render((JXON)obj);
@@ -17,6 +17,6 @@ public interface Render extends aplikigo.gui.Render{
 	
 	@Override
 	default void config( JXON json ) {
-	    if( json != null && getCanvas()!=null ) getCanvas().config(json.object(Canvas.TAG));
+	    if( json != null && canvas()!=null ) canvas().config(json);
 	}
 }
