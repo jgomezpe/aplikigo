@@ -3,9 +3,9 @@ package aplikigo.loader;
 import java.io.IOException;
 import java.io.InputStream;
 
-import aplikigo.stream.Loader;
+import aplikigo.stream.InputStreamLoader;
 
-public class FromClassLoader implements Loader{
+public class FromClassLoader implements InputStreamLoader{
 	protected ClassLoader loader = FromClassLoader.class.getClassLoader();
 	
 	public FromClassLoader( ClassLoader loader ) { this.loader = loader; }

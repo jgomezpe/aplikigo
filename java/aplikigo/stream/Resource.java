@@ -12,13 +12,13 @@ import jxon.JXON;
 
 public class Resource {
 	// @TODO check Command, AWTCanvas, I18N, WebDictionaryController, DynWebServer
-	protected HashMap<String, Loader> loader = new HashMap<String, Loader>();
+	protected HashMap<String, InputStreamLoader> loader = new HashMap<String, InputStreamLoader>();
 	
-	public void add( String name, Loader loader ) { this.loader.put(name,loader); }
+	public void add( String name, InputStreamLoader loader ) { this.loader.put(name,loader); }
 	public void del( String name ) { this.loader.remove(name); }
 
 	public InputStream get(String loader, String file)  throws IOException{
-			Loader fl = this.loader.get(loader);
+			InputStreamLoader fl = this.loader.get(loader);
 			if( fl!=null ) return fl.get(file);
 			throw new IOException("·File not found· "+file);
 	}
