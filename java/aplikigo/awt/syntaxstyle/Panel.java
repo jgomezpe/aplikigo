@@ -1,4 +1,4 @@
-package aplikigo.gui.awt.syntaxstyle;
+package aplikigo.awt.syntaxstyle;
 
 import java.awt.Color;
 import java.util.HashMap;

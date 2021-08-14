@@ -1,4 +1,4 @@
-package aplikigo.gui.awt;
+package aplikigo.awt;
 
 /************************************************************
  * Copyright 2004-2005,2007-2008 Masahiko SAWAI All Rights Reserved. 

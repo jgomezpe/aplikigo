@@ -1,4 +1,4 @@
-package aplikigo.gui.awt;
+package aplikigo.awt;
 
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;

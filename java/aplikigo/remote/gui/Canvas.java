@@ -1,5 +1,6 @@
-package aplikigo.remote;
+package aplikigo.remote.gui;
 
+import aplikigo.remote.Component;
 import jxon.JXON;
 
 public class Canvas extends Component implements aplikigo.gui.Canvas{

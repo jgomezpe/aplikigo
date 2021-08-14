@@ -1,21 +1,24 @@
 package aplikigo.remote;
 
-import aplikigo.net.Channel;
+import aplikigo.server.JXONBaseServer;
 import speco.object.Named;
 
 public class Component extends Named implements aplikigo.Component{
-	protected Channel channel;
+	protected JXONBaseServer server;
 
-	public Component(String id) { super(id); }
+	public Component(String id) { this(id, null); }
 	
-	public Component(String id,Channel channel) {
+	public Component(String id, JXONBaseServer server) {
 		super(id);
-		this.channel = channel;
+		this.server = server;
 	}
 	
-	public void setClient( Channel channel ) { this.channel = channel; }
+	public void setServer( JXONBaseServer server ) { this.server = server; }
 	
-	public Object run( String method, Object... args ) throws Exception{
-	    return channel.send(Channel.command(id(), method, args)); 
+	public Object run( String component, String method, Object... args ) throws Exception{
+	    return server.add(server.command(component, method, args));
 	}
+
+	@Override
+	public aplikigo.Component get(String component) { return this; }
 }

@@ -1,8 +1,6 @@
-package aplikigo.web.servlet;
+package aplikigo.store;
 
 import javax.servlet.http.HttpServlet;
-
-import aplikigo.store.DataStore;
 
 public class DataStoreServlet extends HttpServlet{
 	/**

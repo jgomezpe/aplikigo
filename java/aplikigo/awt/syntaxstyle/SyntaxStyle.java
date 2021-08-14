@@ -1,4 +1,4 @@
-package aplikigo.gui.awt.syntaxstyle;
+package aplikigo.awt.syntaxstyle;
 
 import java.io.IOException;
 import java.util.HashMap;

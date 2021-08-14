@@ -1,4 +1,4 @@
-package aplikigo.gui.awt;
+package aplikigo.awt;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -7,10 +7,12 @@ import java.util.HashMap;
 
 import javax.swing.JPanel;
 
+import aplikigo.Component;
 import jxon.JXON;
 
 public class CanvasRender extends JPanel implements aplikigo.gui.canvas.Render{
 	protected JXON object = null;
+	protected String id;
 	
 	/**
 	 * 
@@ -26,6 +28,7 @@ public class CanvasRender extends JPanel implements aplikigo.gui.canvas.Render{
 	public CanvasRender( Color background_color ){
 		setBackground(background_color);
 		canvas = new Canvas(this);
+		id = ""+serialVersionUID;
 	}
 	
 	@Override
@@ -55,4 +58,16 @@ public class CanvasRender extends JPanel implements aplikigo.gui.canvas.Render{
 	    this.canvas = ((Canvas)canvas);
 	    this.canvas.setRender(this);
 	}
+
+	@Override
+	public Component get(String component) {
+	    if( component.equals(id()) ) return this;
+	    return this.canvas().get(component);
+	}
+
+	@Override
+	public String id() { return id; }
+
+	@Override
+	public void id(String id) { this.id = id; }
 }

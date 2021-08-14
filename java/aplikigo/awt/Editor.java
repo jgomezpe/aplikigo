@@ -1,13 +1,15 @@
-package aplikigo.gui.awt;
+package aplikigo.awt;
 
 import java.util.HashMap;
 
 import javax.swing.JScrollPane;
 import javax.swing.text.JTextComponent;
 
+import aplikigo.Component;
 import lifya.Lexer;
+import speco.object.Named;
 
-public abstract class Editor implements aplikigo.gui.Editor{
+public abstract class Editor extends Named implements aplikigo.gui.Editor{
 	protected JTextComponent editArea=null;
 	protected JScrollPane scroll=null;
 	protected String id;
@@ -16,7 +18,7 @@ public abstract class Editor implements aplikigo.gui.Editor{
 	public abstract JScrollPane scroll();
 	
 	public Editor(String id){
-		this.id = id;
+		super(id);
 		editArea = this.editArea();
 		editArea.setVerifyInputWhenFocusTarget(true);
 		scroll = this.scroll();
@@ -68,4 +70,10 @@ public abstract class Editor implements aplikigo.gui.Editor{
 	public String getText() { return editArea.getText(); }
 	
 	public abstract void setLexer( Lexer lexer, HashMap<String, ?> converter );
+	
+	@Override
+	public Component get(String component) {
+	    if(component.equals(id())) return this;
+	    return null;
+	}	
 }

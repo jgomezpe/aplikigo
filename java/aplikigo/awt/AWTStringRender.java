@@ -1,4 +1,4 @@
-package aplikigo.gui.awt;
+package aplikigo.awt;
 
 import java.awt.BorderLayout;
 import java.awt.Font;
@@ -7,6 +7,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 
+import aplikigo.Component;
 import aplikigo.gui.StringRender;
 import jxon.JXON;
 
@@ -46,4 +47,16 @@ public class AWTStringRender extends JPanel implements StringRender{
 
 	@Override
 	public void config(JXON json) {}
+
+	@Override
+	public Component get(String component) {
+	    // TODO Auto-generated method stub
+	    return null;
+	}
+
+	@Override
+	public String id() { return id; }
+
+	@Override
+	public void id(String id) { this.id = id; }
 }

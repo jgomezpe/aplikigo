@@ -1,4 +1,4 @@
-package aplikigo.gui.awt.rsyntax;
+package aplikigo.awt.rsyntax;
 import java.util.HashMap;
 
 import javax.swing.Action;

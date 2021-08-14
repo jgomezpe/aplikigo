@@ -1,4 +1,4 @@
-package aplikigo.gui.awt.rsyntax;
+package aplikigo.awt.rsyntax;
 
 import java.util.HashMap;
 
@@ -13,7 +13,7 @@ import org.fife.ui.rtextarea.RTextScrollPane;
 import lifya.Lexer;
 
 
-public class Editor extends aplikigo.gui.awt.Editor{
+public class Editor extends aplikigo.awt.Editor{
 	protected AbstractTokenMakerFactory atmf = (AbstractTokenMakerFactory)TokenMakerFactory.getDefaultInstance();
 	protected TokenMaker tok;
 	protected RTextScrollPane scroll;
@@ -21,7 +21,7 @@ public class Editor extends aplikigo.gui.awt.Editor{
 	public Editor(String id){
 		super(id);
 		RSyntaxTextArea textArea = (RSyntaxTextArea)editArea;
-		atmf.putMapping("text/"+id, "aplikigo.gui.awt.rsyntax.TokenMaker");
+		atmf.putMapping("text/"+id, "aplikigo.awt.rsyntax.TokenMaker");
 		textArea.setSyntaxEditingStyle("text/"+id);
 		textArea.setCodeFoldingEnabled(true);
 		tok = TokenMaker.lastInstance;
@@ -40,4 +40,5 @@ public class Editor extends aplikigo.gui.awt.Editor{
 		if( scroll==null ) scroll = new RTextScrollPane((RSyntaxTextArea)editArea);
 		return scroll; 
 	}
+	
 }

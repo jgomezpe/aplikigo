@@ -1,4 +1,4 @@
-package aplikigo.gui.awt;
+package aplikigo.awt;
 
 import java.io.OutputStream;
 import javax.swing.*;

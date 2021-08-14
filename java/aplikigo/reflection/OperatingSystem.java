@@ -1,4 +1,4 @@
-package aplikigo.java;
+package aplikigo.reflection;
 import java.io.*;
 
 //
@@ -50,7 +50,7 @@ import java.io.*;
 * (E-mail: <A HREF="mailto:jgomezpe@unal.edu.co">jgomezpe@unal.edu.co</A> )
 * @version 1.0
 */
-public class JavaOS {
+public class OperatingSystem {
 	/**
 	 * Character used for directories hierarchy
 	 */

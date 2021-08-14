@@ -45,4 +45,4 @@
 * (E-mail: <A HREF="mailto:jgomezpe@unal.edu.co">jgomezpe@unal.edu.co</A> )
 * @version 1.0
 */
-package aplikigo.java.process;
+package aplikigo.process;

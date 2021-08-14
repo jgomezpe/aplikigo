@@ -1,21 +1,18 @@
-package aplikigo.java.reflect;
+package aplikigo.reflection;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Enumeration;
 
-import speco.array.Array;
+import speco.array.ArrayMultiSet;
 import aplikigo.stream.Reader;
 
-public class NSGLClassLoader extends ClassLoader{
-	protected Array<ClassLoader> loader = new Array<ClassLoader>();
+public class AplikigoClassLoader extends ClassLoader{
+	protected ArrayMultiSet<ClassLoader> loader = new ArrayMultiSet<ClassLoader>();
 	
 	public void addLoader( ClassLoader cl ) { loader.add(cl); }
-	public void delLoader( ClassLoader cl ) { 
-		Integer i = loader.find(cl);
-		if( i!=null ) loader.remove(i);
-	}
+	public void delLoader( ClassLoader cl ) { loader.remove(cl); }
 	public void clear() { loader.clear(); }
 	
 	@Override
@@ -65,6 +62,6 @@ public class NSGLClassLoader extends ClassLoader{
 	// protected Package getPackage(String name)
 	// protected Package[] getPackages()	
 	
-	protected static NSGLClassLoader nsgl = new NSGLClassLoader();
-	public static NSGLClassLoader get(){ return nsgl; }
+	protected static AplikigoClassLoader nsgl = new AplikigoClassLoader();
+	public static AplikigoClassLoader get(){ return nsgl; }
 }

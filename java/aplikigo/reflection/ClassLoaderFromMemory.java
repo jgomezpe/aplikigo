@@ -1,4 +1,4 @@
-package aplikigo.java.reflect;
+package aplikigo.reflection;
 
 import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
@@ -15,7 +15,7 @@ import java.util.jar.JarInputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-public class FromMemory {
+public class ClassLoaderFromMemory {
 	public static HashMap<String, byte[]> jar(byte[] bytes) throws Exception{
 		JarInputStream jar = new JarInputStream(new ByteArrayInputStream(bytes));
 		final HashMap<String, byte[]> map = new HashMap<>();
@@ -74,7 +74,7 @@ public class FromMemory {
 	}
 
 	public static ClassLoader jarLoader(byte[] bytes){
-		try { return new URLClassLoader(new URL[]{url(jar(bytes))}, FromMemory.class.getClassLoader());	} catch (Exception e) { e.printStackTrace(); }
+		try { return new URLClassLoader(new URL[]{url(jar(bytes))}, ClassLoaderFromMemory.class.getClassLoader());	} catch (Exception e) { e.printStackTrace(); }
 		return null;
 	}
 }

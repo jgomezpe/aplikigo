@@ -1,10 +1,9 @@
-package aplikigo.java.compiler;
+package aplikigo.reflection;
 
 import java.io.*;
 import java.util.*;
 
-import aplikigo.java.JavaOS;
-import aplikigo.java.process.*;
+import aplikigo.process.*;
 
 //
 //Unalcol Service structure Pack 1.0 by Jonatan Gomez-Perdomo
@@ -87,7 +86,7 @@ public class Compiler {
 	 * Adds a source path to the sources path collection
 	 * @param path New source path
 	 */
-	public void addSourcePath(String path) { sourcePath.add(JavaOS.systemPath(path)); }
+	public void addSourcePath(String path) { sourcePath.add(OperatingSystem.systemPath(path)); }
 
 	/**
 	 * Adds a class path to the classes path collection
@@ -101,7 +100,7 @@ public class Compiler {
 	 * @param path Path to be removed
 	 */
 	protected void removePath(Vector<String> paths, String path) {
-		path = JavaOS.systemPath(path);
+		path = OperatingSystem.systemPath(path);
 		for (int i = paths.size() - 1; i >= 0; i--) if (paths.get(i).compareTo(path) == 0) paths.remove(i); 
 	}
 
@@ -121,7 +120,7 @@ public class Compiler {
 	 * Sets the destination path (directory for putting the class files)
 	 * @param outputPath Destination path
 	 */
-	public void setOutputPath(String outputPath) { this.destination = JavaOS.systemPath(outputPath); }
+	public void setOutputPath(String outputPath) { this.destination = OperatingSystem.systemPath(outputPath); }
 
 	/**
 	 * Creates the appropriated java compiling code for the given paths (source or classes)
@@ -131,13 +130,13 @@ public class Compiler {
 	protected String commandStr(Vector<String> paths) {
 		StringBuilder sb = new StringBuilder();
 		if (paths.size() > 0) {
-			sb.append(JavaOS.closingCharacter());
+			sb.append(OperatingSystem.closingCharacter());
 			sb.append(paths.get(0));
 			for (int i = 1; i < paths.size(); i++) {
-				sb.append(JavaOS.pathSeparator());
+				sb.append(OperatingSystem.pathSeparator());
 				sb.append(paths.get(i));
 			}
-			sb.append(JavaOS.closingCharacter());
+			sb.append(OperatingSystem.closingCharacter());
 		}
 		return sb.toString();
 	}
@@ -184,8 +183,10 @@ public class Compiler {
 		for( int i=0; i<command.length; i++ ){
 			sb.append( command[i]);
 			sb.append(" ");
-		}		
-		return ExternalProcess.run(sb.toString(), new PrintStream(out), new PrintStream(err));
+		}
+		ProcessRunner java = new ProcessRunner(sb.toString());
+		java.streams(null, new PrintStream(out), new PrintStream(err));
+		return true;
 	}
 
 	/**
