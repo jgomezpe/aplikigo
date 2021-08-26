@@ -36,30 +36,25 @@
  * (E-mail: <A HREF="mailto:jgomezpe@unal.edu.co">jgomezpe@unal.edu.co</A> )
  * @version 1.0
  */
-package aplikigo.gui;
+package aplikigo.gui.canvas;
 
 import aplikigo.Component;
+import speco.jxon.JXON;
+import speco.object.Configurable;
 
 /**
- * <p>Console for showing error and messages</p>
+ * <p>Abstract Canvas GUI</p>
  *
  */
-public interface Console extends Component{
+public interface Canvas extends Component, Configurable{
 	/**
-	 * Shows the output or error console
-	 * @param output <i>true</i> shows the output console, <i>false</i> shows the error console
+	 * Canvas TAG
 	 */
-	void display( boolean output );
+	static final String TAG = "canvas";
 	
 	/**
-	 * Shows an error message in the console
-	 * @param message Error message
+	 * Draws an object
+	 * @param c Object to draw
 	 */
-	public void error( String message );
-	
-	/**
-	 * Shows an output message in the console
-	 * @param message Output message
-	 */
-	public void out( String message );
+	void draw( JXON c );	
 }

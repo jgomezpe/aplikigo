@@ -1,4 +1,6 @@
 /**
+ * <p>Remote server classes and methods.</p>
+ *
  * <p>Copyright: Copyright (c) 2019</p>
  *
  * <h3>License</h3>
@@ -36,30 +38,4 @@
  * (E-mail: <A HREF="mailto:jgomezpe@unal.edu.co">jgomezpe@unal.edu.co</A> )
  * @version 1.0
  */
-package aplikigo.gui;
-
-import aplikigo.Component;
-
-/**
- * <p>Console for showing error and messages</p>
- *
- */
-public interface Console extends Component{
-	/**
-	 * Shows the output or error console
-	 * @param output <i>true</i> shows the output console, <i>false</i> shows the error console
-	 */
-	void display( boolean output );
-	
-	/**
-	 * Shows an error message in the console
-	 * @param message Error message
-	 */
-	public void error( String message );
-	
-	/**
-	 * Shows an output message in the console
-	 * @param message Output message
-	 */
-	public void out( String message );
-}
+package aplikigo.server;

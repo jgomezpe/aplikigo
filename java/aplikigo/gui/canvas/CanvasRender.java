@@ -36,30 +36,50 @@
  * (E-mail: <A HREF="mailto:jgomezpe@unal.edu.co">jgomezpe@unal.edu.co</A> )
  * @version 1.0
  */
-package aplikigo.gui;
+package aplikigo.gui.canvas;
 
-import aplikigo.Component;
+import speco.object.JXONfyable;
+import aplikigo.gui.Render;
+import speco.jxon.JXON;
 
 /**
- * <p>Console for showing error and messages</p>
+ * <p>Render component for a canvas (component holding the canvas)</p>
  *
  */
-public interface Console extends Component{
+public interface CanvasRender extends Render{
 	/**
-	 * Shows the output or error console
-	 * @param output <i>true</i> shows the output console, <i>false</i> shows the error console
+	 * Sets the Canvas
+	 * @param canvas Canvas
 	 */
-	void display( boolean output );
+	void canvas( Canvas canvas );	
 	
 	/**
-	 * Shows an error message in the console
-	 * @param message Error message
+	 * Gets the Canvas
+	 * @return Canvas
 	 */
-	public void error( String message );
+	Canvas canvas();
 	
 	/**
-	 * Shows an output message in the console
-	 * @param message Output message
+	 * Draws the given object information (JXON) on the canvas
+	 * @param obj Object to draw (JXON information)
 	 */
-	public void out( String message );
+	default void render( JXON obj ){ if( obj!=null && canvas()!=null ) canvas().draw(obj); }
+	
+	/**
+	 * Draws the given object on the canvas
+	 * @param obj Object to draw
+	 */
+	default void render( Object obj ){
+		if( obj instanceof JXON ) render((JXON)obj);
+		else if( obj instanceof JXONfyable ) render(((JXONfyable)obj).jxon());
+	}
+	
+	/**
+	 * Configures the canvas render
+	 * @param jxon Canvas render configuration information
+	 */
+	@Override
+	default void config( JXON jxon ) {
+		if( jxon != null && canvas()!=null ) canvas().config(jxon);
+	}
 }

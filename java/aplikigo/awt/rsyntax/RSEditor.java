@@ -36,30 +36,68 @@
  * (E-mail: <A HREF="mailto:jgomezpe@unal.edu.co">jgomezpe@unal.edu.co</A> )
  * @version 1.0
  */
-package aplikigo.gui;
+package aplikigo.awt.rsyntax;
 
-import aplikigo.Component;
+import java.util.HashMap;
+
+import javax.swing.JScrollPane;
+import javax.swing.text.JTextComponent;
+
+import org.fife.ui.rsyntaxtextarea.AbstractTokenMakerFactory;
+import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
+import org.fife.ui.rsyntaxtextarea.TokenMakerFactory;
+import org.fife.ui.rtextarea.RTextScrollPane;
+
+import aplikigo.awt.AWTEditor;
+import lifya.Lexer;
+
 
 /**
- * <p>Console for showing error and messages</p>
+ * <p>An editor based on the RSyntaxArea</p>
  *
  */
-public interface Console extends Component{
-	/**
-	 * Shows the output or error console
-	 * @param output <i>true</i> shows the output console, <i>false</i> shows the error console
-	 */
-	void display( boolean output );
+public class RSEditor extends AWTEditor{
+	protected AbstractTokenMakerFactory atmf = (AbstractTokenMakerFactory)TokenMakerFactory.getDefaultInstance();
+	protected RSTokenMaker tok;
+	protected RTextScrollPane scroll;
 	
 	/**
-	 * Shows an error message in the console
-	 * @param message Error message
+	 * Creates a RSyntax editor
+	 * @param id Editor's id
 	 */
-	public void error( String message );
+	public RSEditor(String id){
+		super(id);
+		RSyntaxTextArea textArea = (RSyntaxTextArea)editArea;
+		atmf.putMapping("text/"+id, "aplikigo.awt.rsyntax.RSTokenMaker");
+		textArea.setSyntaxEditingStyle("text/"+id);
+		textArea.setCodeFoldingEnabled(true);
+		tok = RSTokenMaker.lastInstance;
+	}
 	
 	/**
-	 * Shows an output message in the console
-	 * @param message Output message
+	 * Sets the lexer for syntactic coloring of text (if required) 
+	 * @param tokenizer Lexer required for obtaining lexema 
+	 * @param converter Lexeme Coloring table
 	 */
-	public void out( String message );
+	@SuppressWarnings("unchecked")
+	@Override
+	public void setLexer( Lexer tokenizer, HashMap<String, ?> converter ){ this.tok.setLexer(id, tokenizer, (HashMap<String,Integer>)converter); }
+	
+	/**
+	 * Gets the AWT Text component associated to the editor
+	 * @return AWT Text component associated to the editor
+	 */
+	public JTextComponent editArea(){
+		if( editArea==null ) editArea = new RSyntaxTextArea();
+		return editArea;	
+	}
+	
+	/**
+	 * Gets the scroll panel associated to the editor
+	 * @return scroll panel associated to the editor
+	 */
+	public JScrollPane scroll(){
+		if( scroll==null ) scroll = new RTextScrollPane((RSyntaxTextArea)editArea);
+		return scroll; 
+	}
 }

@@ -36,30 +36,58 @@
  * (E-mail: <A HREF="mailto:jgomezpe@unal.edu.co">jgomezpe@unal.edu.co</A> )
  * @version 1.0
  */
-package aplikigo.gui;
+package aplikigo.awt.canvas;
 
-import aplikigo.Component;
+import java.awt.Graphics2D;
+import java.awt.geom.AffineTransform;
 
 /**
- * <p>Console for showing error and messages</p>
- *
+ * <p>Utility for scaling paint objects to dependent/independent device coordinates</p>
  */
-public interface Console extends Component{
+public class Graphics2DScaler {
 	/**
-	 * Shows the output or error console
-	 * @param output <i>true</i> shows the output console, <i>false</i> shows the error console
+	 * Scale factor in the x axe
 	 */
-	void display( boolean output );
-	
+	protected double sx;
+   
 	/**
-	 * Shows an error message in the console
-	 * @param message Error message
+	 * Scale factor in the y axe
 	 */
-	public void error( String message );
-	
+	protected double sy;
+
 	/**
-	 * Shows an output message in the console
-	 * @param message Output message
+	 * Creates a scaling utility (dependent/independent device coordinates) with scale factor of 1.0
 	 */
-	public void out( String message );
+	public Graphics2DScaler() {
+		sx = 1.0;
+		sy = 1.0;
+	}
+
+	/**
+	 * Creates a scaling utility (dependent/independent device coordinates) with the given scale factor
+	 * @param sx Scale factor in the x axe
+	 * @param sy Scale factor in the y axe
+	 */
+	public Graphics2DScaler(double sx, double sy) {
+		this.sx = sx;
+		this.sy = sy;
+	}
+
+	/**
+	 * Scales the given paint object (according to the scale factor) to dependent device coordinates
+	 * @param g Graphics2D to be scaled
+	 */
+	public void scale(Graphics2D g) { 
+		g.setTransform(AffineTransform.getScaleInstance(sx, sy));
+	}
+
+	/**
+	 * Scales the given paint object (according to the scale factor) to independent device coordinates
+	 * @param g Graphics2D to be scaled
+	 */
+	public void scalePI(Graphics2D g) {
+		AffineTransform tr = g.getDeviceConfiguration().getNormalizingTransform();
+		tr.scale(sx, sy);
+		g.setTransform(tr);
+	}
 }

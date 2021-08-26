@@ -2,8 +2,9 @@ package aplikigo.awt;
 
 /************************************************************
  * Copyright 2004-2005,2007-2008 Masahiko SAWAI All Rights Reserved. 
- ************************************************************/
-/**** Adapted by Professor Jonatan Gomez to manage i18n. Added suppress warnings ***/
+ ****************************************************************
+ * Adapted by Professor Jonatan Gomez to manage i18n. Added suppress warnings 
+ */
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -61,7 +62,7 @@ import utila.I18N;
  *      Font font = fontChooser.getSelectedFont(); 
  *      System.out.println("Selected Font : " + font); 
  *   }
- * <pre>
+ * </pre>
  **/
 public class JFontChooser extends JComponent
 {

@@ -36,30 +36,40 @@
  * (E-mail: <A HREF="mailto:jgomezpe@unal.edu.co">jgomezpe@unal.edu.co</A> )
  * @version 1.0
  */
-package aplikigo.gui;
+package aplikigo.remotegui;
 
-import aplikigo.Component;
+import aplikigo.server.JXONBaseServer;
+import speco.jxon.JXON;
 
 /**
- * <p>Console for showing error and messages</p>
+ * <p>Remote render</p>
  *
  */
-public interface Console extends Component{
+public class RemoteRender extends RemoteComponent implements aplikigo.gui.Render{
 	/**
-	 * Shows the output or error console
-	 * @param output <i>true</i> shows the output console, <i>false</i> shows the error console
+	 * Creates a Remote Render 
+	 * @param id Render id
+	 * @param server Remote editor
 	 */
-	void display( boolean output );
-	
+	public RemoteRender(String id, JXONBaseServer server){ super(id, server); }
+
 	/**
-	 * Shows an error message in the console
-	 * @param message Error message
+	 * Configures the remote render
+	 * @param jxon Render configuration information
 	 */
-	public void error( String message );
-	
+	@Override
+	public void config(JXON jxon) { try{ run(id(), "config", jxon); }catch(Exception e) {} 	}
+
 	/**
-	 * Shows an output message in the console
-	 * @param message Output message
+	 * Draws the given object 
+	 * @param obj Object to draw
 	 */
-	public void out( String message );
+	@Override
+	public void render(Object obj) { try{ run(id(), "render", obj); }catch(Exception e) {} }
+
+	/**
+	 * Initializes the render (draw object)
+	 */
+	@Override
+	public void init() { try{ run(id(), "init"); }catch(Exception e) {}  }
 }

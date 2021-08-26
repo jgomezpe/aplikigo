@@ -36,30 +36,57 @@
  * (E-mail: <A HREF="mailto:jgomezpe@unal.edu.co">jgomezpe@unal.edu.co</A> )
  * @version 1.0
  */
-package aplikigo.gui;
+package aplikigo.remotegui;
 
 import aplikigo.Component;
+import aplikigo.server.JXONBaseServer;
+import speco.object.Named;
 
 /**
- * <p>Console for showing error and messages</p>
+ * <p>A remote component</p>
  *
  */
-public interface Console extends Component{
+public class RemoteComponent extends Named implements Component{
+	protected JXONBaseServer server;
+
 	/**
-	 * Shows the output or error console
-	 * @param output <i>true</i> shows the output console, <i>false</i> shows the error console
+	 * Creates a remote component
+	 * @param id Component's id
 	 */
-	void display( boolean output );
+	public RemoteComponent(String id) { this(id, null); }
 	
 	/**
-	 * Shows an error message in the console
-	 * @param message Error message
+	 * Creates a remote component
+	 * @param server Server
+	 * @param id Component's id
 	 */
-	public void error( String message );
+	public RemoteComponent(String id, JXONBaseServer server) {
+		super(id);
+		this.server = server;
+	}
 	
 	/**
-	 * Shows an output message in the console
-	 * @param message Output message
+	 * Sets remote server
+	 * @param server Server
 	 */
-	public void out( String message );
+	public void setServer( JXONBaseServer server ) { this.server = server; }
+	
+	/**
+	 * Runs the method of the component using the provided arguments
+	 * @param method Method's name
+	 * @param args Arguments for running the method
+	 * @return Object resulting of running the method
+	 * @throws Exception If some error occurs or the method is not available or accessible
+	 */
+	public Object run( String component, String method, Object... args ) throws Exception{
+		return server.add(server.command(component, method, args));
+	}
+
+	/**
+	 * Obtains a subcomponent
+	 * @param component Subcomponent id
+	 * @return <i>this</i> 
+	 */
+	@Override
+	public Component get(String component) { return this; }
 }

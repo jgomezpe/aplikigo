@@ -36,30 +36,56 @@
  * (E-mail: <A HREF="mailto:jgomezpe@unal.edu.co">jgomezpe@unal.edu.co</A> )
  * @version 1.0
  */
-package aplikigo.gui;
+package aplikigo.awt.syntaxstyle;
 
-import aplikigo.Component;
+import java.util.HashMap;
+
+import javax.swing.JScrollPane;
+import javax.swing.text.JTextComponent;
+
+import aplikigo.awt.AWTEditor;
+import lifya.Lexer;
 
 /**
- * <p>Console for showing error and messages</p>
+ * <p>Simple syntax style editor</p>
  *
  */
-public interface Console extends Component{
+public class SSEditor extends AWTEditor{
 	/**
-	 * Shows the output or error console
-	 * @param output <i>true</i> shows the output console, <i>false</i> shows the error console
+	 * Creates a simple syntax style editor
+	 * @param id Editor's id
 	 */
-	void display( boolean output );
+	public SSEditor(String id){ super(id); }
 	
 	/**
-	 * Shows an error message in the console
-	 * @param message Error message
+	 * Sets the syntax coloring table
+	 * @param styles Style associated to a lexema
 	 */
-	public void error( String message );
+	public void setStyle(HashMap<String, SyntaxStyle> styles ){ ((SSEditorPanel)editArea).setStyle(styles); }
 	
 	/**
-	 * Shows an output message in the console
-	 * @param message Output message
+	 * Gets the AWT Text component associated to the editor
+	 * @return AWT Text component associated to the editor
 	 */
-	public void out( String message );
+	public JTextComponent editArea(){
+		if( editArea==null ) editArea = new SSEditorPanel();
+		return editArea;	
+	}
+	
+	/**
+	 * Gets the scroll panel associated to the editor
+	 * @return scroll panel associated to the editor
+	 */
+	public JScrollPane scroll(){
+		if( scroll==null ) scroll = new JScrollPane();
+		return scroll; 
+	}
+	
+	/**
+	 * Sets the lexer for syntactic coloring of text (if required) 
+	 * @param tokenizer Lexer required for obtaining lexema 
+	 * @param converter Lexeme Coloring table
+	 */
+	@SuppressWarnings("unchecked")
+	public void setLexer( Lexer tokenizer, HashMap<String, ?> converter ){ ((SSEditorPanel)editArea).setLexer(tokenizer, (HashMap<String, String>)converter); }
 }

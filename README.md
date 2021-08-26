@@ -1,4 +1,4 @@
-# aplikigo
+# aplikigo (Application in Esperanto)
 Java/Javascript components for developing desktop and wed applications based on the numtseng infrastructure. 
 
 &nbsp;Java components require:
@@ -26,7 +26,7 @@ and <A HREF="https://github.com/jgomezpe/aplikigo/js/">https://github.com/jgomez
 
 &nbsp;Java/Javascript source code: <A HREF="https://github.com/jgomezpe/kompari/">https://github.com/jgomezpe/aplikigo/</A>
 
-&nbsp;Java API documentation: <A HREF="https://numtseng.com/api/aplikigo/java/">https://numtseng.com/api/aplikigo/java/</A>
+&nbsp;Java API documentation: <A HREF="https://numtseng.com/api/java/aplikigo/">https://numtseng.com/api/java/aplikigo/</A>
 
 &nbsp;Javascript API documentation: <A HREF="https://numtseng.com/api/aplikigo/">https://numtseng.com/api/aplikigo/</A>
 

@@ -36,30 +36,55 @@
  * (E-mail: <A HREF="mailto:jgomezpe@unal.edu.co">jgomezpe@unal.edu.co</A> )
  * @version 1.0
  */
-package aplikigo.gui;
+package aplikigo.remotegui;
 
-import aplikigo.Component;
+import aplikigo.gui.Console;
+import aplikigo.server.JXONBaseServer;
 
 /**
- * <p>Console for showing error and messages</p>
+ * <p>Remote console</p>
  *
  */
-public interface Console extends Component{
+public class RemoteConsole extends RemoteComponent implements Console{
+    protected String out="";
+    protected String err="";
+	
+	/**
+	 * Creates a Remote Console 
+	 * @param id Console id
+	 * @param server Remote server
+	 */
+    public RemoteConsole(String id, JXONBaseServer server){ super(id, server); }
+
 	/**
 	 * Shows the output or error console
 	 * @param output <i>true</i> shows the output console, <i>false</i> shows the error console
 	 */
-	void display( boolean output );
-	
+    @Override
+    public void display(boolean output){
+    	try {
+    		if( output ) run(id(), "out", out);
+    		else run(id(), "error", err);
+    	}catch(Exception e) {}
+    }
+
 	/**
-	 * Shows an error message in the console
-	 * @param message Error message
+	 * Shows an error message in the remote console
+	 * @param txt Error message
 	 */
-	public void error( String message );
-	
+    @Override
+    public void error(String txt) {
+    	err = txt;
+    	display(false);
+    }
+
 	/**
-	 * Shows an output message in the console
-	 * @param message Output message
+	 * Shows an output message in the remote console
+	 * @param txt Output message
 	 */
-	public void out( String message );
+    @Override
+    public void out(String txt) {
+    	out = txt;
+    	display(true);
+    }
 }

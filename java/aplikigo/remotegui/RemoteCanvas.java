@@ -36,30 +36,33 @@
  * (E-mail: <A HREF="mailto:jgomezpe@unal.edu.co">jgomezpe@unal.edu.co</A> )
  * @version 1.0
  */
-package aplikigo.gui;
+package aplikigo.remotegui;
 
-import aplikigo.Component;
+import aplikigo.gui.canvas.Canvas;
+import speco.jxon.JXON;
 
 /**
- * <p>Console for showing error and messages</p>
+ * <p>Remote canvas component</p>
  *
  */
-public interface Console extends Component{
+public class RemoteCanvas extends RemoteComponent implements Canvas{	
 	/**
-	 * Shows the output or error console
-	 * @param output <i>true</i> shows the output console, <i>false</i> shows the error console
+	 * Creates a Remote Canvas 
+	 * @param id Canvas id
 	 */
-	void display( boolean output );
+	public RemoteCanvas( String id ){ super(id); }
 	
 	/**
-	 * Shows an error message in the console
-	 * @param message Error message
+	 * Draws an object
+	 * @param jxon Object to draw
 	 */
-	public void error( String message );
-	
+	@Override
+	public void draw( JXON jxon ){ try{ run("draw", jxon); }catch(Exception e) {} }
+
 	/**
-	 * Shows an output message in the console
-	 * @param message Output message
+	 * Configures the remote canvas
+	 * @param c Canvas configuration information
 	 */
-	public void out( String message );
+	@Override
+	public void config(JXON c) { try{ run("config", c); }catch(Exception e) {} }
 }

@@ -36,30 +36,46 @@
  * (E-mail: <A HREF="mailto:jgomezpe@unal.edu.co">jgomezpe@unal.edu.co</A> )
  * @version 1.0
  */
-package aplikigo.gui;
-
-import aplikigo.Component;
+package aplikigo.gui.canvas;
 
 /**
- * <p>Console for showing error and messages</p>
+ * <p>Canvas drawing TAGS </p>
  *
  */
-public interface Console extends Component{
-	/**
-	 * Shows the output or error console
-	 * @param output <i>true</i> shows the output console, <i>false</i> shows the error console
-	 */
-	void display( boolean output );
-	
-	/**
-	 * Shows an error message in the console
-	 * @param message Error message
-	 */
-	public void error( String message );
-	
-	/**
-	 * Shows an output message in the console
-	 * @param message Output message
-	 */
-	public void out( String message );
+public class CanvasConstants{
+	public final static String COMMAND="command";
+	public final static String SCALE="scale";
+	public final static String ROTATE="rotate";
+	public final static String TRANSLATE="translate";
+	public final static String COMPOUND="compound";
+	public final static String MOVETO="moveTo";
+	public final static String LINETO="lineTo";
+	public final static String QUADTO="quadTo";
+	public final static String CURVETO="curveTo";
+	public final static String TEXT="text";
+	public final static String IMAGE="image";
+	public final static String BEGIN="beginPath";
+	public final static String CLOSE="closePath";
+	public final static String STROKE="stroke";
+	public final static String FILL="fill";
+	public final static String STROKESTYLE="strokeStyle";
+	public final static String FILLSTYLE="fillStyle";
+	public final static String LINE="line";
+	public final static String POLYLINE="polyline";
+	public final static String POLYGON="polygon";
+	public final static String FIT="fit";
+	// Arguments of the command
+	public final static String CUSTOM="custom";
+	public final static String COMMANDS="commands";
+	public final static String X="x";
+	public final static String Y="y";
+	public final static String MESSAGE="message";
+	public final static String URL="url";
+	public final static String IMAGE_REF="reflection";
+	public final static String LINEWIDTH="lineWidth";
+	public final static String RADIAL="radial";
+	public final static String STARTCOLOR="startcolor";
+	public final static String ENDCOLOR="endcolor";
+	public final static String R="r";
+
 }

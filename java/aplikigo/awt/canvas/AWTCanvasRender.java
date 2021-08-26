@@ -36,100 +36,116 @@
  * (E-mail: <A HREF="mailto:jgomezpe@unal.edu.co">jgomezpe@unal.edu.co</A> )
  * @version 1.0
  */
-package aplikigo.awt;
+package aplikigo.awt.canvas;
 
-import java.awt.BorderLayout;
-import java.awt.Font;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Image;
+import java.util.HashMap;
 
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextPane;
 
 import aplikigo.Component;
-import aplikigo.gui.StringRender;
+import aplikigo.gui.canvas.Canvas;
+import aplikigo.gui.canvas.CanvasRender;
 import speco.jxon.JXON;
 
 /**
- * <p>String render for AWT</p>
+ * <p>AWT canvas render </p>
  *
  */
-public class AWTStringRender extends JPanel implements StringRender{
+public class AWTCanvasRender extends JPanel implements CanvasRender{
+	protected JXON object = null;
 	protected String id;
 	
-	BorderLayout layout = new BorderLayout();
-	JTextPane textArea = new JTextPane();
-	JScrollPane scroll;
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = -8976916928457960190L;
+	private static final long serialVersionUID = -1691456845015325692L;
 
+	protected AWTCanvas canvas;
+	
+	protected HashMap<String, Image> images = new HashMap<String,Image>();
+	
 	/**
-	 * Creates a text render
+	 * Creates a panel holding an AWT canvas with white background color
 	 */
-	public AWTStringRender(){
-		scroll = new JScrollPane(textArea);
-		this.setLayout(layout);
-		this.add(scroll, BorderLayout.CENTER);		
+	public AWTCanvasRender(){ this(new Color(255,255,255)); }
+	
+	/**
+	 * Creates a panel holding an AWT canvas with the given background color
+	 * @param background_color Background color
+	 */
+	public AWTCanvasRender( Color background_color ){
+		setBackground(background_color);
+		canvas = new AWTCanvas(this);
+		id = ""+serialVersionUID;
 	}
 	
 	/**
-	 * Creates a text render
-	 * @param id Text render id
+	 * Initializes the render (draw object)
 	 */
-	public AWTStringRender( String id ){
-		this();
-		this.id = id;
+	@Override
+	public void init() { object = null; }
+
+	/**
+	 * Draws the given object information (JXON) on the canvas
+	 * @param obj Object to draw (JXON information)
+	 */
+	@Override
+	public void render( JXON obj ){
+		object = obj;
+		updateUI();
 	}
-
-	/**
-	 * Draws the given text 
-	 * @param str Text to draw
-	 */
-	@Override
-	public void render(String str){ textArea.setText(str);	}
 	
 	/**
-	 * Adds the given text 
-	 * @param str Text to add
+	 * Paints the graphic component
+	 * @param g Graphic component
 	 */
-	@Override
-	public void add(String str){ textArea.setText(textArea.getText()+"\n"+str); }
-	
+	protected void paintComponent(Graphics g){
+		super.paintComponent(g);
+		canvas.setGraphics( g );
+		if( object!= null ) canvas.draw(object);
+	}		
+
 	/**
-	 * Initializes the render (draw text)
+	 * Gets the Canvas
+	 * @return Canvas
 	 */
 	@Override
-	public void init() { textArea.setText(""); }
+	public Canvas canvas(){ return canvas; }
 
-	/** 
-	 * Sets the render's font
-	 * @param font Font
+	/**
+	 * Sets the Canvas
+	 * @param canvas Canvas
 	 */
 	@Override
-	public void setFont( Font font ) { if( textArea!=null) textArea.setFont(font); }
-
-	@Override
-	public void config(JXON json) {}
+	public void canvas(Canvas canvas){
+	    this.canvas = ((AWTCanvas)canvas);
+	    this.canvas.setRender(this);
+	}
 
 	/**
 	 * Obtains a subcomponent
 	 * @param component Subcomponent id
-	 * @return <i>null</i>
+	 * @return The subcomponent with the given id, <i>null</i> otherwise
 	 */
 	@Override
-	public Component get(String component) { return null; }
+	public Component get(String component) {
+	    if( component.equals(id()) ) return this;
+	    return this.canvas().get(component);
+	}
 
 	/**
-	 * Gets the string render id
-	 * @return String render id 
+	 * Gets the canvas render id
+	 * @return Canvas render id 
 	 */
 	@Override
 	public String id() { return id; }
 
 	/**
-	 * Sets the string render id
-	 * @param id String render id 
+	 * Sets the canvas render id
+	 * @param id Canvas render id 
 	 */
 	@Override
 	public void id(String id) { this.id = id; }

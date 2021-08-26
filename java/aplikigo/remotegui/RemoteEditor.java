@@ -36,100 +36,84 @@
  * (E-mail: <A HREF="mailto:jgomezpe@unal.edu.co">jgomezpe@unal.edu.co</A> )
  * @version 1.0
  */
-package aplikigo.gui;
+package aplikigo.remotegui;
 
-import speco.object.JXONfyable;
-import speco.jxon.JXON;
-import speco.object.Configurable;
+import aplikigo.server.JXONBaseServer;
 
 /**
- * <p>Abstract color</p>
+ * <p>Remote editor</p>
  *
  */
-public class Color implements JXONfyable, Configurable{
-	/**
-	 * Color TAG
-	 */
-	public static final String TAG="color";
-	/**
-	 * Red color component TAG
-	 */
-	public static final String RED="red";
+public class RemoteEditor extends RemoteComponent implements aplikigo.gui.Editor{
+	protected String txt;
+	protected int[] loc; 
 	
 	/**
-	 * Green color component TAG
+	 * Creates a Remote Editor 
+	 * @param id Editor id
+	 * @param server Remote editor
 	 */
-	public static final String GREEN="green";
+	public RemoteEditor(String id, JXONBaseServer server){ super(id, server); }
 
 	/**
-	 * Blue color component TAG
-	 */
-	public static final String BLUE="blue";
-
-	/**
-	 * Alpha color component TAG
-	 */
-	public static final String ALPHA="alpha";
-
-	protected int r;
-	protected int g;
-	protected int b;
-	protected int a;
-	
-	/**
-	 * Creates a aplikigo color
-	 * @param R Red component
-	 * @param G Green component
-	 * @param B Blue component
-	 * @param A Alpha component
-	 */
-	public Color(int R, int G, int B, int A){
-		this.r = R;
-		this.g = G;
-		this.b = B;
-		this.a = A;
-	}
-	
-	/**
-	 * Creates an aplikigo component
-	 * @param jxon Color information
-	 */
-	public Color(JXON jxon) { this.config(jxon); }
-
-	public int red(){ return r; }
-	public int green(){ return g; }
-	public int blue(){ return b; }
-	public int alpha(){ return a; }
-	
-	/**
-	 * Gets the components of the color as an array [red,green,blue,alpha]
-	 * @return Components of the color as an array [red,green,blue,alpha]
-	 */
-	public int[] values(){ return new int[]{r,g,b,a}; }
-	
-	/**
-	 * Creates a JXON version of the color
-	 * @return JXON version of the color
+	 * Highlights a row
+	 * @param row Row to highlight
 	 */
 	@Override
-	public JXON jxon() {
-		JXON jxon = new JXON();
-		jxon.set(Color.RED, red());
-		jxon.set(Color.GREEN, green());
-		jxon.set(Color.BLUE, blue());
-		jxon.set(Color.ALPHA, alpha());
-		return jxon;
-	}
-	    
+	public void highlight(int row){ try{ run(id(), "highlight", row); }catch(Exception e) {} }
+
 	/**
-	 * Configures the color with the information provided by the JXON object
-	 * @param jxon Configuration information
+	 * Sets the editor cursor
+	 * @param row Row for the editor's cursor
+	 * @param column Column for the editor's cursor
 	 */
 	@Override
-	public void config(JXON jxon){ 
-		r = jxon.integer(RED);
-		g = jxon.integer(GREEN);
-		b = jxon.integer(BLUE);
-		a = jxon.integer(ALPHA);
+	public void locate(int row, int column){ try{ run(id(), "locateCursor", row, column); }catch(Exception e) {} }
+
+	/**
+	 * Sets the editor's text
+	 * @param txt Text to set in the editor
+	 */
+	@Override
+	public void setText(String txt){ try{ run(id(), "setText", txt); }catch(Exception e) {} }
+
+	/**
+	 * Gets the current text in the editor
+	 * @return Current text in the editor
+	 */
+	@SuppressWarnings("static-access")
+	@Override
+	public String getText() {
+		txt = null;
+		try{ run(id(), "getText"); }catch(Exception e) {}
+		while( txt == null ) {
+			try{ Thread.currentThread().sleep(50); }catch (InterruptedException e) { e.printStackTrace(); }
+		}
+		return txt;
+	}
+
+	/**
+	 * Gets the position of the editor's cursor
+	 * @return [x,y] current position of the editor's cursor
+	 */
+	@SuppressWarnings("static-access")
+	@Override
+	public int[] getLocation() {
+		loc = null;
+		try{ run(id(), "getLocation"); }catch(Exception e) {}
+		while( loc == null ) {
+			try{ Thread.currentThread().sleep(50); }catch (InterruptedException e) { e.printStackTrace(); }
+		}
+		return loc;
+	}
+	
+	protected Object updateText( String txt ) {
+		this.txt = txt;
+		return null;
+	}
+	
+	protected Object updateLocation( int row, int column ) {
+		loc = new int[] {row, column};
+		return null;
 	}
 }
