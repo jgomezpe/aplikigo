@@ -107,13 +107,11 @@ public abstract class ProcessServer extends JXONBaseServer{
 			InputStream out = process.output();
 			while(out.available()>0) {
 				char c = (char)out.read();
-				System.out.print(c);
 				sb.append(c);
 			}
 			InputStream err = process.error();
 			while(err.available()>0) {
 				char c = (char)err.read();
-				System.out.print(c);
 				sb.append(c);
 			}
 			if(out.available()>0 || err.available()>0 || process.isRunning()) input(command);

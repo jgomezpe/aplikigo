@@ -54,11 +54,11 @@ class EndPoint{
      * If not provided, the end-point will use the callback provided its defined callback function
      */
     request( arg, callback ){
-        callback = callback || this.callback
+        this.callback = callback || this.callback
         var x = this
         var xhttp = new XMLHttpRequest()
         xhttp.onreadystatechange = function (){
-            if (xhttp.readyState==4 && xhttp.status == 200) callback( x.parse(xhttp) )
+            if (xhttp.readyState==4 && xhttp.status == 200) x.callback( x.parse(xhttp) )
             
         }
         
@@ -110,7 +110,29 @@ class ProcessRunner extends JXONEndPoint{
         super(url,jxon)
         this.component = component
         this.args = args
+        this.timer = 10
     }
+    
+    /**
+     * Function that will be called when receiving the response of the server (must process the full XMLHttpRequest).
+     * @param xhttp Object with the response and request.
+     */
+	callback(response){
+		var x = this
+		if(response.args[0]!=null){
+			if(response.args[0].length > 0 ){
+				x.timer = 10
+				x.out( response.args[0] )
+				x.request({"component":x.component,"method":"pull","args":[""]})  
+			}else{
+				setTimeout( function(){ x.request({"component":x.component,"method":"pull","args":[""]}) }, x.timer )
+				if( x.timer<100 ) x.timer += 10
+			}                  
+		}else{
+			x.running = false
+			x.out()
+		}
+	}
      
     /**
      * Runs the process
@@ -118,16 +140,8 @@ class ProcessRunner extends JXONEndPoint{
      */    
     run( out ){
         var x = this
+        x.out = out
         this.running = true
-        this.callback = function(response){
-            if(response.args[0]!=null){
-                out( response.args[0] )
-                x.request({"component":x.component,"method":"pull","args":[""]})                    
-            }else{
-                x.running = false
-                out()
-            }
-        }
         this.request({"component":x.component,"method":"start","args":x.args})
     }
      
@@ -145,6 +159,7 @@ class ProcessRunner extends JXONEndPoint{
      */   
     input( cmd ){
         var x = this
+        x.timer = 10
         this.request({"component":this.component,"method":"pull","args":[cmd]})  
     }
 }
